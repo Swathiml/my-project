@@ -1,0 +1,128 @@
+{
+  "docs": 3,
+  "facts": 5,
+  "verified": 4,
+  "low_confidence": 1,
+  "manual_review": 0,
+  "chains": [
+    {
+      "fact": {
+        "type": "receipt",
+        "value": {
+          "merchant": "Trader Joe's",
+          "amount": 39.12
+        },
+        "metadata": {
+          "items": 2
+        }
+      },
+      "evidence": {
+        "source_document": "406fb379-c26f-4f9b-8c40-7ba6a2b2b3cf",
+        "ocr_confidence": 0.96,
+        "extraction_confidence": 0.8,
+        "document_quality": 0.92,
+        "composite_confidence": 0.7066,
+        "raw_text_snippet": "\n    TRADER JOE'S #8839\n    Date: 02/07/2026\n    3x Greek Yogurt $14.97\n    1x Avocados 4pk $5.99\n    Subtotal: $36.91\n    Tax 6.00%: $2.21\n    TOTAL: $39.12\n    Paid: DEBIT\n    ",
+        "extraction_method": "receipt"
+      },
+      "status": "low_confidence",
+      "timestamp": "2026-03-30T11:14:21.774639"
+    },
+    {
+      "fact": {
+        "type": "statement",
+        "value": {
+          "desc": "GROCERY STORE #1234",
+          "amount": 45.67
+        },
+        "metadata": {
+          "type": "debit"
+        }
+      },
+      "evidence": {
+        "source_document": "00a0a4f0-4fc9-4b6e-b77d-0c6433f9282c",
+        "ocr_confidence": 0.94,
+        "extraction_confidence": 0.64,
+        "document_quality": 0.9,
+        "composite_confidence": 0.5414,
+        "raw_text_snippet": "\n    JOHN DOE\n    Statement Period: 01/01/2026 to 01/31/2026\n    \n    01/05/2026 GROCERY STORE #1234 45.67 7,654.33\n    01/15/2026 PAYROLL DEPOSIT 2,500.00 8,501.68\n    01/20/2026 SHELL OIL 48.50 8,29",
+        "extraction_method": "statement"
+      },
+      "status": "verified",
+      "timestamp": "2026-03-30T11:14:24.511080"
+    },
+    {
+      "fact": {
+        "type": "statement",
+        "value": {
+          "desc": "PAYROLL DEPOSIT",
+          "amount": 2500.0
+        },
+        "metadata": {
+          "type": "credit"
+        }
+      },
+      "evidence": {
+        "source_document": "00a0a4f0-4fc9-4b6e-b77d-0c6433f9282c",
+        "ocr_confidence": 0.94,
+        "extraction_confidence": 0.64,
+        "document_quality": 0.9,
+        "composite_confidence": 0.5414,
+        "raw_text_snippet": "\n    JOHN DOE\n    Statement Period: 01/01/2026 to 01/31/2026\n    \n    01/05/2026 GROCERY STORE #1234 45.67 7,654.33\n    01/15/2026 PAYROLL DEPOSIT 2,500.00 8,501.68\n    01/20/2026 SHELL OIL 48.50 8,29",
+        "extraction_method": "statement"
+      },
+      "status": "verified",
+      "timestamp": "2026-03-30T11:14:26.574637"
+    },
+    {
+      "fact": {
+        "type": "statement",
+        "value": {
+          "desc": "SHELL OIL",
+          "amount": 48.5
+        },
+        "metadata": {
+          "type": "debit"
+        }
+      },
+      "evidence": {
+        "source_document": "00a0a4f0-4fc9-4b6e-b77d-0c6433f9282c",
+        "ocr_confidence": 0.94,
+        "extraction_confidence": 0.64,
+        "document_quality": 0.9,
+        "composite_confidence": 0.5414,
+        "raw_text_snippet": "\n    JOHN DOE\n    Statement Period: 01/01/2026 to 01/31/2026\n    \n    01/05/2026 GROCERY STORE #1234 45.67 7,654.33\n    01/15/2026 PAYROLL DEPOSIT 2,500.00 8,501.68\n    01/20/2026 SHELL OIL 48.50 8,29",
+        "extraction_method": "statement"
+      },
+      "status": "verified",
+      "timestamp": "2026-03-30T11:14:28.605495"
+    },
+    {
+      "fact": {
+        "type": "invoice",
+        "value": {
+          "vendor": "Tech Solutions Llc",
+          "client": "Client Corp",
+          "amount": 2700.0,
+          "invoice_number": "INV-2026-001234"
+        },
+        "metadata": {
+          "line_items": 2,
+          "subtotal": 2500.0,
+          "tax": 200.0
+        }
+      },
+      "evidence": {
+        "source_document": "bd4ab043-2846-4d59-a225-110e5ffce7b6",
+        "ocr_confidence": 0.95,
+        "extraction_confidence": 0.91,
+        "document_quality": 0.91,
+        "composite_confidence": 0.7867,
+        "raw_text_snippet": "\n    Tech Solutions LLC\n    \n    Invoice #: INV-2026-001234\n    Date: 02/15/2026\n    Due Date: 03/17/2026\n    \n    Bill To: Client Corp\n    \n    Consulting Services | 10 | $150.00 | $1,500.00\n    Soft",
+        "extraction_method": "invoice"
+      },
+      "status": "verified",
+      "timestamp": "2026-03-30T11:14:30.497531"
+    }
+  ]
+}

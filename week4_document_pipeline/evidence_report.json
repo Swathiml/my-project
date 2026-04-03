@@ -1,0 +1,67 @@
+{
+  "generated_at": "2026-03-16T10:48:51.223580",
+  "total_facts": 3,
+  "verified": 3,
+  "low_confidence": 0,
+  "manual_review": 0,
+  "chains": [
+    {
+      "fact": {
+        "type": "merchant",
+        "value": "Trader Joe's",
+        "metadata": {
+          "location": "store_8839"
+        }
+      },
+      "evidence": {
+        "source_document": "receipt_001.jpg",
+        "ocr_confidence": 0.95,
+        "extraction_confidence": 0.94,
+        "document_quality": 0.92,
+        "composite_confidence": 0.8216,
+        "raw_text_snippet": "\n    TRADER JOE'S #8839\n    Date: 02/07/2026\n    TOTAL: $39.12\n    ",
+        "extraction_method": "receipt_extractor"
+      },
+      "status": "verified",
+      "timestamp": "2026-03-16T10:48:51.222513"
+    },
+    {
+      "fact": {
+        "type": "date",
+        "value": "2026-02-07",
+        "metadata": {}
+      },
+      "evidence": {
+        "source_document": "receipt_001.jpg",
+        "ocr_confidence": 0.95,
+        "extraction_confidence": 0.98,
+        "document_quality": 0.92,
+        "composite_confidence": 0.8565,
+        "raw_text_snippet": "\n    TRADER JOE'S #8839\n    Date: 02/07/2026\n    TOTAL: $39.12\n    ",
+        "extraction_method": "receipt_extractor"
+      },
+      "status": "verified",
+      "timestamp": "2026-03-16T10:48:51.222534"
+    },
+    {
+      "fact": {
+        "type": "amount",
+        "value": 39.12,
+        "metadata": {
+          "currency": "USD"
+        }
+      },
+      "evidence": {
+        "source_document": "receipt_001.jpg",
+        "ocr_confidence": 0.95,
+        "extraction_confidence": 0.96,
+        "document_quality": 0.92,
+        "composite_confidence": 0.839,
+        "raw_text_snippet": "\n    TRADER JOE'S #8839\n    Date: 02/07/2026\n    TOTAL: $39.12\n    ",
+        "extraction_method": "receipt_extractor"
+      },
+      "status": "verified",
+      "timestamp": "2026-03-16T10:48:51.222539"
+    }
+  ]
+}

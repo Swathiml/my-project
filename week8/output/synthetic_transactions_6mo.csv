@@ -1,0 +1,292 @@
+transaction_id,date,amount,merchant_raw,merchant_key,category,is_recurring,is_anomaly,pattern_tag
+txn_0001,2026-01-01,-7.47,SQ * STARBUCKS #5012 CHICAGO,starbucks,dining,False,False,baseline
+txn_0002,2026-01-01,3200.0,DIRECT DEPOSIT PAYROLL 9856,payroll,income,True,False,baseline
+txn_0003,2026-01-01,-75.0,ATT MOBILE PAYMENT 4116,att,utilities,True,False,baseline
+txn_0004,2026-01-02,3200.0,DIRECT DEPOSIT PAYROLL 8956,payroll,income,True,False,baseline
+txn_0005,2026-01-02,-39.82,SHELL OIL 229057420389,shell_gas,transportation,False,False,baseline
+txn_0006,2026-01-04,-4.87,STARBUCKS COFFEE #2584,starbucks,dining,False,False,baseline
+txn_0007,2026-01-04,-34.87,AMAZON.COM*2049 SAN FRANCISCO,amazon,shopping,False,False,baseline
+txn_0008,2026-01-05,-29.93,UBER EATS HELP.UBER.COM,uber_eats,dining,False,False,baseline
+txn_0009,2026-01-06,-11.24,MCDONALD'S #5422 AUSTIN,mcdonalds,dining,False,False,baseline
+txn_0010,2026-01-06,-35.9,AMAZON.COM*7932 CHICAGO,amazon,shopping,False,False,baseline
+txn_0011,2026-01-08,-67.08,AMAZON.COM*7669 CHICAGO,amazon,shopping,False,False,baseline
+txn_0012,2026-01-09,-7.74,SQ *SQ *STARBUCKS 1106,starbucks,dining,False,False,baseline
+txn_0013,2026-01-09,-13.65,MCDONALD'S #8527 SEATTLE,mcdonalds,dining,False,False,baseline
+txn_0014,2026-01-10,-74.78,WALMART.COM - 8433 AR,walmart,groceries,False,False,baseline
+txn_0015,2026-01-12,-9.47,MCDONALD'S #5374 AUSTIN,mcdonalds,dining,False,False,baseline
+txn_0016,2026-01-13,-90.53,TST* WHOLE FOODS MKT #8668 SEATTLE,whole_foods,groceries,False,False,baseline
+txn_0017,2026-01-13,-9.95,MCDONALD'S #6977 CHICAGO,mcdonalds,dining,False,False,baseline
+txn_0018,2026-01-13,-42.69,UBER EATS HELP.UBER.COM,uber_eats,dining,False,False,baseline
+txn_0019,2026-01-14,-5.86,STARBUCKS COFFEE #3547,starbucks,dining,False,False,baseline
+txn_0020,2026-01-14,-4.63,SQ * STARBUCKS #2535 CHICAGO,starbucks,dining,False,False,baseline
+txn_0021,2026-01-16,-35.39,SHELL OIL 694757420389,shell_gas,transportation,False,False,baseline
+txn_0022,2026-01-16,-67.27,TST* WHOLE FOODS MKT #1771 NEW YORK,whole_foods,groceries,False,False,baseline
+txn_0023,2026-01-17,-6.91,SQ *SQ *STARBUCKS 4257,starbucks,dining,False,False,baseline
+txn_0024,2026-01-17,-100.96,WALMART.COM - 9317 AR,walmart,groceries,False,False,baseline
+txn_0025,2026-01-18,-128.86,TST* WHOLE FOODS MKT #1188 AUSTIN,whole_foods,groceries,False,False,baseline
+txn_0026,2026-01-18,-54.07,SHELL OIL 968957420389,shell_gas,transportation,False,False,baseline
+txn_0027,2026-01-19,-9.35,MCDONALD'S #2139 NEW YORK,mcdonalds,dining,False,False,baseline
+txn_0028,2026-01-19,-53.24,AMAZON.COM*4608 NEW YORK,amazon,shopping,False,False,baseline
+txn_0029,2026-01-20,-12.44,MCDONALD'S #9751 AUSTIN,mcdonalds,dining,False,False,baseline
+txn_0030,2026-01-21,-72.8,TST* WHOLE FOODS MKT #7916 SEATTLE,whole_foods,groceries,False,False,baseline
+txn_0031,2026-01-22,-49.12,AMAZON MARKETPLACE 9834,amazon,shopping,False,False,baseline
+txn_0032,2026-01-22,-130.78,TST* WHOLE FOODS MKT #5371 AUSTIN,whole_foods,groceries,False,False,baseline
+txn_0033,2026-01-23,-38.7,AMAZON MARKETPLACE 7118,amazon,shopping,False,False,baseline
+txn_0034,2026-01-23,-6.68,SQ *SQ *STARBUCKS 4611,starbucks,dining,False,False,baseline
+txn_0035,2026-01-23,-57.87,AMAZON.COM*4750 NEW YORK,amazon,shopping,False,False,baseline
+txn_0036,2026-01-24,-4.91,SQ *SQ *STARBUCKS 9935,starbucks,dining,False,False,baseline
+txn_0037,2026-01-25,-28.32,CVS PHARMACY #3060 CHICAGO,cvs,healthcare,False,False,baseline
+txn_0038,2026-01-25,-10.03,MCDONALD'S #2307 CHICAGO,mcdonalds,dining,False,False,baseline
+txn_0039,2026-01-26,-31.31,UBER EATS HELP.UBER.COM,uber_eats,dining,False,False,baseline
+txn_0040,2026-01-27,-91.12,WALMART.COM - 4258 AR,walmart,groceries,False,False,baseline
+txn_0041,2026-01-27,-40.37,UBER EATS HELP.UBER.COM,uber_eats,dining,False,False,baseline
+txn_0042,2026-01-28,-39.83,AMAZON MARKETPLACE 9423,amazon,shopping,False,False,baseline
+txn_0043,2026-01-29,-91.42,ELECTRIC COMPANY BILL 8579,electric,utilities,True,False,baseline
+txn_0044,2026-01-29,-36.67,UBER EATS HELP.UBER.COM,uber_eats,dining,False,False,baseline
+txn_0045,2026-01-30,-10.65,MCDONALD'S #5803 AUSTIN,mcdonalds,dining,False,False,baseline
+txn_0046,2026-01-30,-43.86,UBER EATS HELP.UBER.COM,uber_eats,dining,False,False,baseline
+txn_0047,2026-01-31,-9.99,SPOTIFY USA,spotify,entertainment,True,False,baseline
+txn_0048,2026-01-31,-15.49,NETFLIX.COM 7939 CA,netflix,entertainment,True,False,baseline
+txn_0049,2026-02-01,-51.2,AMAZON.COM*9821 AUSTIN,amazon,shopping,False,False,baseline
+txn_0050,2026-02-01,3200.0,DIRECT DEPOSIT PAYROLL 4443,payroll,income,True,False,baseline
+txn_0051,2026-02-02,-5.16,STARBUCKS COFFEE #1035,starbucks,dining,False,False,baseline
+txn_0052,2026-02-03,-7.2,SQ * STARBUCKS #4853 MIAMI,starbucks,dining,False,False,baseline
+txn_0053,2026-02-03,-11.76,MCDONALD'S #9288 SAN FRANCISCO,mcdonalds,dining,False,False,baseline
+txn_0054,2026-02-04,-55.79,AMAZON MARKETPLACE 6663,amazon,shopping,False,False,baseline
+txn_0055,2026-02-04,-36.93,CVS PHARMACY #5279 CHICAGO,cvs,healthcare,False,False,baseline
+txn_0056,2026-02-05,-12.7,MCDONALD'S #5915 MIAMI,mcdonalds,dining,False,False,baseline
+txn_0057,2026-02-06,-98.93,WAL-MART #6442 SUPER CENTER,walmart,groceries,False,False,baseline
+txn_0058,2026-02-06,-11.07,MCDONALD'S #9900 AUSTIN,mcdonalds,dining,False,False,baseline
+txn_0059,2026-02-07,-7.18,STARBUCKS COFFEE #6147,starbucks,dining,False,False,baseline
+txn_0060,2026-02-08,-38.99,SHELL OIL 854157420389,shell_gas,transportation,False,False,baseline
+txn_0061,2026-02-08,-109.17,WAL-MART #3900 SUPER CENTER,walmart,groceries,False,False,baseline
+txn_0062,2026-02-09,-72.93,TST* WHOLE FOODS MKT #8239 SEATTLE,whole_foods,groceries,False,False,baseline
+txn_0063,2026-02-09,-52.74,WAL-MART #2771 SUPER CENTER,walmart,groceries,False,False,baseline
+txn_0064,2026-02-09,-43.11,UBER EATS HELP.UBER.COM,uber_eats,dining,False,False,baseline
+txn_0065,2026-02-10,-5.37,SQ *SQ *STARBUCKS 1958,starbucks,dining,False,False,baseline
+txn_0066,2026-02-12,-76.81,TST* WHOLE FOODS MKT #5088 AUSTIN,whole_foods,groceries,False,False,baseline
+txn_0067,2026-02-12,-14.17,MCDONALD'S #5002 SAN FRANCISCO,mcdonalds,dining,False,False,baseline
+txn_0068,2026-02-14,-7.13,STARBUCKS COFFEE #9565,starbucks,dining,False,False,baseline
+txn_0069,2026-02-14,-70.2,TST* WHOLE FOODS MKT #6050 SAN FRANCISCO,whole_foods,groceries,False,False,baseline
+txn_0070,2026-02-14,-56.37,AMAZON MARKETPLACE 9379,amazon,shopping,False,False,baseline
+txn_0071,2026-02-16,3200.0,DIRECT DEPOSIT PAYROLL 4501,payroll,income,True,False,baseline
+txn_0072,2026-02-17,-4.82,SQ *SQ *STARBUCKS 4044,starbucks,dining,False,False,baseline
+txn_0073,2026-02-18,-4.74,SQ * STARBUCKS #6138 NEW YORK,starbucks,dining,False,False,baseline
+txn_0074,2026-02-18,-60.77,TST* WHOLE FOODS MKT #2232 AUSTIN,whole_foods,groceries,False,False,baseline
+txn_0075,2026-02-18,-62.88,TST* WHOLE FOODS MKT #7049 SEATTLE,whole_foods,groceries,False,False,baseline
+txn_0076,2026-02-19,-31.4,AMAZON MARKETPLACE 1727,amazon,shopping,False,False,baseline
+txn_0077,2026-02-19,-5.48,SQ * STARBUCKS #1651 SEATTLE,starbucks,dining,False,False,baseline
+txn_0078,2026-02-19,-6.41,SQ * STARBUCKS #9701 CHICAGO,starbucks,dining,False,False,baseline
+txn_0079,2026-02-20,-14.89,MCDONALD'S #9666 NEW YORK,mcdonalds,dining,False,False,baseline
+txn_0080,2026-02-22,-8.73,MCDONALD'S #3200 SAN FRANCISCO,mcdonalds,dining,False,False,baseline
+txn_0081,2026-02-22,-38.86,SHELL OIL 637857420389,shell_gas,transportation,False,False,baseline
+txn_0082,2026-02-23,-31.86,UBER EATS HELP.UBER.COM,uber_eats,dining,False,False,baseline
+txn_0083,2026-02-24,-8.48,SQ * STARBUCKS #8973 CHICAGO,starbucks,dining,False,False,baseline
+txn_0084,2026-02-24,-36.06,UBER EATS HELP.UBER.COM,uber_eats,dining,False,False,baseline
+txn_0085,2026-02-25,-14.55,MCDONALD'S #1152 MIAMI,mcdonalds,dining,False,False,baseline
+txn_0086,2026-02-25,-84.79,WAL-MART #7658 SUPER CENTER,walmart,groceries,False,False,baseline
+txn_0087,2026-02-25,-40.58,SHELL OIL 934657420389,shell_gas,transportation,False,False,baseline
+txn_0088,2026-02-26,-7.64,SQ *SQ *STARBUCKS 5673,starbucks,dining,False,False,baseline
+txn_0089,2026-02-26,-75.0,ATT MOBILE PAYMENT 3085,att,utilities,True,False,baseline
+txn_0090,2026-02-26,-15.49,NETFLIX.COM 6409 CA,netflix,entertainment,True,False,baseline
+txn_0091,2026-02-27,-30.53,UBER EATS HELP.UBER.COM,uber_eats,dining,False,False,baseline
+txn_0092,2026-02-27,-50.91,SHELL OIL 472857420389,shell_gas,transportation,False,False,baseline
+txn_0093,2026-02-28,-111.18,ELECTRIC COMPANY BILL 3851,electric,utilities,True,False,baseline
+txn_0094,2026-02-28,-9.99,SPOTIFY USA,spotify,entertainment,True,False,baseline
+txn_0095,2026-03-01,-75.0,ATT MOBILE PAYMENT 6325,att,utilities,True,False,baseline
+txn_0096,2026-03-01,-49.98,SHELL OIL 185357420389,shell_gas,transportation,False,False,baseline
+txn_0097,2026-03-01,-70.97,AMAZON MARKETPLACE 9031,amazon,shopping,False,False,baseline
+txn_0098,2026-03-02,-29.14,UBER EATS HELP.UBER.COM,uber_eats,dining,False,False,baseline
+txn_0099,2026-03-02,3200.0,DIRECT DEPOSIT PAYROLL 7658,payroll,income,True,False,baseline
+txn_0100,2026-03-03,-112.92,ELECTRIC COMPANY BILL 6576,electric,utilities,True,False,baseline
+txn_0101,2026-03-03,-9.99,SPOTIFY USA,spotify,entertainment,True,False,baseline
+txn_0102,2026-03-04,-29.47,CVS PHARMACY #6111 SEATTLE,cvs,healthcare,False,False,baseline
+txn_0103,2026-03-04,-61.83,AMAZON.COM*5941 AUSTIN,amazon,shopping,False,False,baseline
+txn_0104,2026-03-05,-9.62,MCDONALD'S #3503 AUSTIN,mcdonalds,dining,False,False,baseline
+txn_0105,2026-03-06,-30.15,CVS PHARMACY #2876 CHICAGO,cvs,healthcare,False,False,baseline
+txn_0106,2026-03-06,-7.72,SQ * STARBUCKS #9486 MIAMI,starbucks,dining,False,False,baseline
+txn_0107,2026-03-07,-51.78,SHELL OIL 349657420389,shell_gas,transportation,False,False,baseline
+txn_0108,2026-03-08,-81.83,TST* WHOLE FOODS MKT #8956 NEW YORK,whole_foods,groceries,False,False,baseline
+txn_0109,2026-03-08,-7.73,SQ * STARBUCKS #3414 NEW YORK,starbucks,dining,False,False,baseline
+txn_0110,2026-03-08,-8.44,STARBUCKS COFFEE #2193,starbucks,dining,False,False,baseline
+txn_0111,2026-03-09,-100.16,WAL-MART #7906 SUPER CENTER,walmart,groceries,False,False,baseline
+txn_0112,2026-03-09,-11.08,MCDONALD'S #5681 CHICAGO,mcdonalds,dining,False,False,baseline
+txn_0113,2026-03-11,-10.24,MCDONALD'S #9849 NEW YORK,mcdonalds,dining,False,False,baseline
+txn_0114,2026-03-11,-113.51,TST* WHOLE FOODS MKT #7624 AUSTIN,whole_foods,groceries,False,False,baseline
+txn_0115,2026-03-11,-56.93,WALMART.COM - 6355 AR,walmart,groceries,False,False,baseline
+txn_0116,2026-03-13,-6.48,SQ *SQ *STARBUCKS 4997,starbucks,dining,False,False,baseline
+txn_0117,2026-03-14,-30.57,AMAZON MARKETPLACE 9548,amazon,shopping,False,False,baseline
+txn_0118,2026-03-14,-33.15,UBER EATS HELP.UBER.COM,uber_eats,dining,False,False,baseline
+txn_0119,2026-03-15,-9.81,MCDONALD'S #5050 AUSTIN,mcdonalds,dining,False,False,baseline
+txn_0120,2026-03-16,-48.39,SHELL OIL 457157420389,shell_gas,transportation,False,False,baseline
+txn_0121,2026-03-16,3200.0,DIRECT DEPOSIT PAYROLL 9041,payroll,income,True,False,baseline
+txn_0122,2026-03-18,-5.5,SQ * STARBUCKS #2988 MIAMI,starbucks,dining,False,False,baseline
+txn_0123,2026-03-20,-5.84,STARBUCKS COFFEE #4848,starbucks,dining,False,False,baseline
+txn_0124,2026-03-21,-36.37,SHELL OIL 165957420389,shell_gas,transportation,False,False,baseline
+txn_0125,2026-03-22,-42.23,AMAZON MARKETPLACE 9289,amazon,shopping,False,False,baseline
+txn_0126,2026-03-22,-11.72,MCDONALD'S #6198 MIAMI,mcdonalds,dining,False,False,baseline
+txn_0127,2026-03-22,-4.84,SQ *SQ *STARBUCKS 9445,starbucks,dining,False,False,baseline
+txn_0128,2026-03-23,-4.52,SQ * STARBUCKS #2746 MIAMI,starbucks,dining,False,False,baseline
+txn_0129,2026-03-25,-13.44,MCDONALD'S #8939 AUSTIN,mcdonalds,dining,False,False,baseline
+txn_0130,2026-03-26,-79.03,AMAZON MARKETPLACE 1672,amazon,shopping,False,False,baseline
+txn_0131,2026-03-27,-97.39,TST* WHOLE FOODS MKT #3091 SEATTLE,whole_foods,groceries,False,False,baseline
+txn_0132,2026-03-27,-14.35,MCDONALD'S #8305 CHICAGO,mcdonalds,dining,False,False,baseline
+txn_0133,2026-03-28,-42.61,UBER EATS HELP.UBER.COM,uber_eats,dining,False,False,baseline
+txn_0134,2026-03-28,-76.94,WALMART.COM - 1823 AR,walmart,groceries,False,False,baseline
+txn_0135,2026-03-29,-7.02,SQ *SQ *STARBUCKS 4185,starbucks,dining,False,False,baseline
+txn_0136,2026-03-29,-15.49,NETFLIX.COM 5397 CA,netflix,entertainment,True,False,baseline
+txn_0137,2026-03-30,-91.52,TST* WHOLE FOODS MKT #1444 NEW YORK,whole_foods,groceries,False,False,baseline
+txn_0138,2026-03-31,-62.9,AMAZON.COM*2245 SEATTLE,amazon,shopping,False,False,baseline
+txn_0139,2026-03-31,-32.04,UBER EATS HELP.UBER.COM,uber_eats,dining,False,False,baseline
+txn_0140,2026-03-31,-41.73,AMAZON.COM*8532 AUSTIN,amazon,shopping,False,False,baseline
+txn_0141,2026-04-01,-15.49,NETFLIX.COM 6927 CA,netflix,entertainment,True,False,baseline
+txn_0142,2026-04-01,-9.99,SPOTIFY USA,spotify,entertainment,True,False,baseline
+txn_0143,2026-04-02,-37.05,MCDONALD'S #5786 AUSTIN,mcdonalds,dining,False,False,dining_spike
+txn_0144,2026-04-03,-104.28,ELECTRIC COMPANY BILL 7684,electric,utilities,True,False,baseline
+txn_0145,2026-04-03,-48.2,AMAZON MARKETPLACE 7690,amazon,shopping,False,False,baseline
+txn_0146,2026-04-04,-19.58,STARBUCKS COFFEE #5853,starbucks,dining,False,False,dining_spike
+txn_0147,2026-04-04,-90.4,UBER EATS HELP.UBER.COM,uber_eats,dining,False,False,dining_spike
+txn_0148,2026-04-06,-36.9,MCDONALD'S #5136 MIAMI,mcdonalds,dining,False,False,dining_spike
+txn_0149,2026-04-06,-79.82,AMAZON MARKETPLACE 8141,amazon,shopping,False,False,baseline
+txn_0150,2026-04-06,-87.11,TST* WHOLE FOODS MKT #2229 CHICAGO,whole_foods,groceries,False,False,grocery_drift
+txn_0151,2026-04-07,-14.41,SQ * STARBUCKS #9779 AUSTIN,starbucks,dining,False,False,dining_spike
+txn_0152,2026-04-07,-13.41,SQ *SQ *STARBUCKS 8933,starbucks,dining,False,False,dining_spike
+txn_0153,2026-04-08,-91.35,TST* WHOLE FOODS MKT #5632 AUSTIN,whole_foods,groceries,False,False,grocery_drift
+txn_0154,2026-04-09,-15.65,CVS/PHARMACY #4750 AUSTIN,cvs,healthcare,False,False,baseline
+txn_0155,2026-04-09,-14.32,SQ *SQ *STARBUCKS 4777,starbucks,dining,False,False,dining_spike
+txn_0156,2026-04-10,-20.25,MCDONALD'S #9751 CHICAGO,mcdonalds,dining,False,False,dining_spike
+txn_0157,2026-04-10,-13.47,SQ *SQ *STARBUCKS 4986,starbucks,dining,False,False,dining_spike
+txn_0158,2026-04-13,-87.09,UBER EATS HELP.UBER.COM,uber_eats,dining,False,False,dining_spike
+txn_0159,2026-04-14,-105.64,TST* WHOLE FOODS MKT #8699 SAN FRANCISCO,whole_foods,groceries,False,False,grocery_drift
+txn_0160,2026-04-14,-92.87,TST* WHOLE FOODS MKT #1986 SEATTLE,whole_foods,groceries,False,False,grocery_drift
+txn_0161,2026-04-14,-54.1,WAL-MART #4683 SUPER CENTER,walmart,groceries,False,False,grocery_drift
+txn_0162,2026-04-15,3200.0,DIRECT DEPOSIT PAYROLL 8905,payroll,income,True,False,baseline
+txn_0163,2026-04-15,-25.28,AMAZON.COM*5135 SAN FRANCISCO,amazon,shopping,False,False,baseline
+txn_0164,2026-04-15,-36.61,SHELL OIL 165357420389,shell_gas,transportation,False,False,baseline
+txn_0165,2026-04-15,-48.77,SHELL OIL 759457420389,shell_gas,transportation,False,False,baseline
+txn_0166,2026-04-16,3200.0,DIRECT DEPOSIT PAYROLL 3522,payroll,income,True,False,baseline
+txn_0167,2026-04-19,-14.94,STARBUCKS COFFEE #9698,starbucks,dining,False,False,dining_spike
+txn_0168,2026-04-19,-21.02,STARBUCKS COFFEE #9595,starbucks,dining,False,False,dining_spike
+txn_0169,2026-04-19,-24.98,MCDONALD'S #8843 MIAMI,mcdonalds,dining,False,False,dining_spike
+txn_0170,2026-04-21,-35.2,MCDONALD'S #9042 NEW YORK,mcdonalds,dining,False,False,dining_spike
+txn_0171,2026-04-22,-26.28,AMAZON MARKETPLACE 3634,amazon,shopping,False,False,baseline
+txn_0172,2026-04-22,-64.54,WAL-MART #5334 SUPER CENTER,walmart,groceries,False,False,grocery_drift
+txn_0173,2026-04-23,-49.73,AMAZON.COM*7561 SEATTLE,amazon,shopping,False,False,baseline
+txn_0174,2026-04-24,-16.75,STARBUCKS COFFEE #6764,starbucks,dining,False,False,dining_spike
+txn_0175,2026-04-25,-84.29,TST* WHOLE FOODS MKT #4457 SAN FRANCISCO,whole_foods,groceries,False,False,grocery_drift
+txn_0176,2026-04-25,-33.91,CVS PHARMACY #8708 SEATTLE,cvs,healthcare,False,False,baseline
+txn_0177,2026-04-25,-88.63,UBER EATS HELP.UBER.COM,uber_eats,dining,False,False,dining_spike
+txn_0178,2026-04-25,-44.25,AMAZON MARKETPLACE 9431,amazon,shopping,False,False,baseline
+txn_0179,2026-04-25,-31.81,CVS/PHARMACY #5415 SEATTLE,cvs,healthcare,False,False,baseline
+txn_0180,2026-04-26,-90.64,UBER EATS HELP.UBER.COM,uber_eats,dining,False,False,dining_spike
+txn_0181,2026-04-26,-41.15,SHELL OIL 572857420389,shell_gas,transportation,False,False,baseline
+txn_0182,2026-04-30,-75.0,ATT MOBILE PAYMENT 1472,att,utilities,True,False,baseline
+txn_0183,2026-04-30,-67.38,WAL-MART #3330 SUPER CENTER,walmart,groceries,False,False,grocery_drift
+txn_0184,2026-05-01,-73.39,WALMART.COM - 3024 AR,walmart,groceries,False,False,grocery_drift
+txn_0185,2026-05-01,-9.99,SPOTIFY USA,spotify,entertainment,True,False,savings_drop
+txn_0186,2026-05-02,-127.64,TST* WHOLE FOODS MKT #3153 NEW YORK,whole_foods,groceries,False,False,grocery_drift
+txn_0187,2026-05-02,-53.93,SHELL OIL 598657420389,shell_gas,transportation,False,False,savings_drop
+txn_0188,2026-05-02,-110.96,ELECTRIC COMPANY BILL 9619,electric,utilities,True,False,savings_drop
+txn_0189,2026-05-02,-75.0,ATT MOBILE PAYMENT 1258,att,utilities,True,False,savings_drop
+txn_0190,2026-05-03,-15.49,NETFLIX.COM 3370 CA,netflix,entertainment,True,False,savings_drop
+txn_0191,2026-05-04,-158.73,TST* WHOLE FOODS MKT #1645 SAN FRANCISCO,whole_foods,groceries,False,False,grocery_drift
+txn_0192,2026-05-04,-6.6,SQ *SQ *STARBUCKS 8486,starbucks,dining,False,False,savings_drop
+txn_0193,2026-05-04,-48.5,SHELL OIL 872457420389,shell_gas,transportation,False,False,savings_drop
+txn_0194,2026-05-04,-29.74,UBER EATS HELP.UBER.COM,uber_eats,dining,False,False,savings_drop
+txn_0195,2026-05-05,-6.14,STARBUCKS COFFEE #3529,starbucks,dining,False,False,savings_drop
+txn_0196,2026-05-05,-9.71,MCDONALD'S #7751 SEATTLE,mcdonalds,dining,False,False,savings_drop
+txn_0197,2026-05-05,-6.51,STARBUCKS COFFEE #6439,starbucks,dining,False,False,savings_drop
+txn_0198,2026-05-06,-9.23,MCDONALD'S #7267 SEATTLE,mcdonalds,dining,False,False,savings_drop
+txn_0199,2026-05-07,-46.6,AMAZON.COM*4868 SAN FRANCISCO,amazon,shopping,False,False,savings_drop
+txn_0200,2026-05-08,-79.33,AMAZON.COM*4362 NEW YORK,amazon,shopping,False,False,savings_drop
+txn_0201,2026-05-08,-37.18,CVS PHARMACY #3222 MIAMI,cvs,healthcare,False,False,savings_drop
+txn_0202,2026-05-08,-37.73,UBER EATS HELP.UBER.COM,uber_eats,dining,False,False,savings_drop
+txn_0203,2026-05-08,-6.79,SQ * STARBUCKS #4826 MIAMI,starbucks,dining,False,False,savings_drop
+txn_0204,2026-05-09,-31.39,AMAZON.COM*3001 MIAMI,amazon,shopping,False,False,savings_drop
+txn_0205,2026-05-10,-7.4,STARBUCKS COFFEE #9022,starbucks,dining,False,False,savings_drop
+txn_0206,2026-05-11,-8.24,SQ * STARBUCKS #9318 SAN FRANCISCO,starbucks,dining,False,False,savings_drop
+txn_0207,2026-05-11,-143.76,TST* WHOLE FOODS MKT #3877 CHICAGO,whole_foods,groceries,False,False,grocery_drift
+txn_0208,2026-05-11,-7.48,SQ *SQ *STARBUCKS 7246,starbucks,dining,False,False,savings_drop
+txn_0209,2026-05-13,-6.32,SQ *SQ *STARBUCKS 6272,starbucks,dining,False,False,savings_drop
+txn_0210,2026-05-13,-7.1,SQ *SQ *STARBUCKS 6383,starbucks,dining,False,False,savings_drop
+txn_0211,2026-05-13,-8.32,SQ * STARBUCKS #8994 SEATTLE,starbucks,dining,False,False,savings_drop
+txn_0212,2026-05-14,-14.85,MCDONALD'S #2646 MIAMI,mcdonalds,dining,False,False,savings_drop
+txn_0213,2026-05-15,-140.44,WALMART.COM - 3306 AR,walmart,groceries,False,False,grocery_drift
+txn_0214,2026-05-15,-280.0,AMAZON.COM*9999 SEATTLE,amazon,shopping,False,True,anomaly
+txn_0215,2026-05-15,-41.91,UBER EATS HELP.UBER.COM,uber_eats,dining,False,False,savings_drop
+txn_0216,2026-05-15,-30.11,UBER EATS HELP.UBER.COM,uber_eats,dining,False,False,savings_drop
+txn_0217,2026-05-16,3200.0,DIRECT DEPOSIT PAYROLL 9408,payroll,income,True,False,savings_drop
+txn_0218,2026-05-16,-14.39,MCDONALD'S #3344 CHICAGO,mcdonalds,dining,False,False,savings_drop
+txn_0219,2026-05-18,-6.44,SQ *SQ *STARBUCKS 6446,starbucks,dining,False,False,savings_drop
+txn_0220,2026-05-18,-5.08,SQ *SQ *STARBUCKS 4122,starbucks,dining,False,False,savings_drop
+txn_0221,2026-05-19,-30.98,UBER EATS HELP.UBER.COM,uber_eats,dining,False,False,savings_drop
+txn_0222,2026-05-19,-42.3,UBER EATS HELP.UBER.COM,uber_eats,dining,False,False,savings_drop
+txn_0223,2026-05-19,-32.96,AMAZON.COM*4817 SAN FRANCISCO,amazon,shopping,False,False,savings_drop
+txn_0224,2026-05-20,-4.77,SQ *SQ *STARBUCKS 5708,starbucks,dining,False,False,savings_drop
+txn_0225,2026-05-22,-76.96,AMAZON.COM*9850 MIAMI,amazon,shopping,False,False,savings_drop
+txn_0226,2026-05-22,-32.73,AMAZON MARKETPLACE 1349,amazon,shopping,False,False,savings_drop
+txn_0227,2026-05-22,-35.93,UBER EATS HELP.UBER.COM,uber_eats,dining,False,False,savings_drop
+txn_0228,2026-05-22,-42.04,AMAZON MARKETPLACE 6876,amazon,shopping,False,False,savings_drop
+txn_0229,2026-05-23,-30.9,UBER EATS HELP.UBER.COM,uber_eats,dining,False,False,savings_drop
+txn_0230,2026-05-23,-10.1,MCDONALD'S #1474 NEW YORK,mcdonalds,dining,False,False,savings_drop
+txn_0231,2026-05-24,-8.02,STARBUCKS COFFEE #2143,starbucks,dining,False,False,savings_drop
+txn_0232,2026-05-24,-48.45,SHELL OIL 724257420389,shell_gas,transportation,False,False,savings_drop
+txn_0233,2026-05-26,-8.39,MCDONALD'S #6873 SAN FRANCISCO,mcdonalds,dining,False,False,savings_drop
+txn_0234,2026-05-26,-7.78,SQ * STARBUCKS #3492 MIAMI,starbucks,dining,False,False,savings_drop
+txn_0235,2026-05-26,-123.78,TST* WHOLE FOODS MKT #6994 SEATTLE,whole_foods,groceries,False,False,grocery_drift
+txn_0236,2026-05-26,-8.38,SQ *SQ *STARBUCKS 6546,starbucks,dining,False,False,savings_drop
+txn_0237,2026-05-27,-87.8,TST* WHOLE FOODS MKT #8894 SAN FRANCISCO,whole_foods,groceries,False,False,grocery_drift
+txn_0238,2026-05-27,-43.08,UBER EATS HELP.UBER.COM,uber_eats,dining,False,False,savings_drop
+txn_0239,2026-05-29,-44.89,AMAZON MARKETPLACE 2622,amazon,shopping,False,False,savings_drop
+txn_0240,2026-05-30,-49.02,SHELL OIL 768957420389,shell_gas,transportation,False,False,savings_drop
+txn_0241,2026-05-30,-47.2,SHELL OIL 203557420389,shell_gas,transportation,False,False,savings_drop
+txn_0242,2026-05-31,-129.19,WALMART.COM - 6992 AR,walmart,groceries,False,False,grocery_drift
+txn_0243,2026-05-31,-77.09,AMAZON MARKETPLACE 1536,amazon,shopping,False,False,savings_drop
+txn_0244,2026-06-01,-28.63,UBER EATS HELP.UBER.COM,uber_eats,dining,False,False,baseline
+txn_0245,2026-06-01,3200.0,DIRECT DEPOSIT PAYROLL 8404,payroll,income,True,False,baseline
+txn_0246,2026-06-01,-15.49,NETFLIX.COM 4232 CA,netflix,entertainment,True,False,baseline
+txn_0247,2026-06-02,-9.99,SPOTIFY USA,spotify,entertainment,True,False,baseline
+txn_0248,2026-06-02,-74.93,WAL-MART #1897 SUPER CENTER,walmart,groceries,False,False,grocery_drift
+txn_0249,2026-06-03,-42.94,SHELL OIL 169357420389,shell_gas,transportation,False,False,baseline
+txn_0250,2026-06-03,-27.84,UBER EATS HELP.UBER.COM,uber_eats,dining,False,False,baseline
+txn_0251,2026-06-04,-81.46,WALMART.COM - 8972 AR,walmart,groceries,False,False,grocery_drift
+txn_0252,2026-06-04,-40.25,UBER EATS HELP.UBER.COM,uber_eats,dining,False,False,baseline
+txn_0253,2026-06-04,-7.67,SQ *SQ *STARBUCKS 2874,starbucks,dining,False,False,baseline
+txn_0254,2026-06-05,-4.76,SQ *SQ *STARBUCKS 5505,starbucks,dining,False,False,baseline
+txn_0255,2026-06-05,-42.6,SHELL OIL 477057420389,shell_gas,transportation,False,False,baseline
+txn_0256,2026-06-06,-156.46,TST* WHOLE FOODS MKT #1815 AUSTIN,whole_foods,groceries,False,False,grocery_drift
+txn_0257,2026-06-08,-41.95,UBER EATS HELP.UBER.COM,uber_eats,dining,False,False,baseline
+txn_0258,2026-06-08,-46.14,AMAZON.COM*7560 SEATTLE,amazon,shopping,False,False,baseline
+txn_0259,2026-06-09,-39.05,UBER EATS HELP.UBER.COM,uber_eats,dining,False,False,baseline
+txn_0260,2026-06-09,-124.08,TST* WHOLE FOODS MKT #7947 MIAMI,whole_foods,groceries,False,False,grocery_drift
+txn_0261,2026-06-10,-150.31,WALMART.COM - 3248 AR,walmart,groceries,False,False,grocery_drift
+txn_0262,2026-06-11,-64.48,WALMART.COM - 9149 AR,walmart,groceries,False,False,grocery_drift
+txn_0263,2026-06-12,-14.68,MCDONALD'S #8770 NEW YORK,mcdonalds,dining,False,False,baseline
+txn_0264,2026-06-12,-8.73,MCDONALD'S #9313 CHICAGO,mcdonalds,dining,False,False,baseline
+txn_0265,2026-06-13,-33.4,UBER EATS HELP.UBER.COM,uber_eats,dining,False,False,baseline
+txn_0266,2026-06-13,-15.52,CVS PHARMACY #6321 CHICAGO,cvs,healthcare,False,False,baseline
+txn_0267,2026-06-13,-72.23,AMAZON MARKETPLACE 6562,amazon,shopping,False,False,baseline
+txn_0268,2026-06-13,-32.74,CVS/PHARMACY #7843 SAN FRANCISCO,cvs,healthcare,False,False,baseline
+txn_0269,2026-06-14,-106.41,TST* WHOLE FOODS MKT #9394 NEW YORK,whole_foods,groceries,False,False,grocery_drift
+txn_0270,2026-06-14,-7.42,STARBUCKS COFFEE #6120,starbucks,dining,False,False,baseline
+txn_0271,2026-06-15,3200.0,DIRECT DEPOSIT PAYROLL 2257,payroll,income,True,False,baseline
+txn_0272,2026-06-15,-53.42,SHELL OIL 612957420389,shell_gas,transportation,False,False,baseline
+txn_0273,2026-06-17,-5.68,STARBUCKS COFFEE #9282,starbucks,dining,False,False,baseline
+txn_0274,2026-06-17,-5.71,STARBUCKS COFFEE #1510,starbucks,dining,False,False,baseline
+txn_0275,2026-06-17,-5.39,SQ *SQ *STARBUCKS 1710,starbucks,dining,False,False,baseline
+txn_0276,2026-06-17,-50.6,AMAZON.COM*6724 SAN FRANCISCO,amazon,shopping,False,False,baseline
+txn_0277,2026-06-19,-6.69,SQ *SQ *STARBUCKS 6327,starbucks,dining,False,False,baseline
+txn_0278,2026-06-20,-43.58,UBER EATS HELP.UBER.COM,uber_eats,dining,False,False,baseline
+txn_0279,2026-06-22,-8.86,MCDONALD'S #6793 AUSTIN,mcdonalds,dining,False,False,baseline
+txn_0280,2026-06-24,-111.74,TST* WHOLE FOODS MKT #2391 NEW YORK,whole_foods,groceries,False,False,grocery_drift
+txn_0281,2026-06-25,-30.09,AMAZON.COM*9363 AUSTIN,amazon,shopping,False,False,baseline
+txn_0282,2026-06-26,-8.91,MCDONALD'S #1982 SEATTLE,mcdonalds,dining,False,False,baseline
+txn_0283,2026-06-27,-32.24,CVS PHARMACY #6928 NEW YORK,cvs,healthcare,False,False,baseline
+txn_0284,2026-06-27,-8.6,MCDONALD'S #8075 NEW YORK,mcdonalds,dining,False,False,baseline
+txn_0285,2026-06-28,-6.11,SQ *SQ *STARBUCKS 2768,starbucks,dining,False,False,baseline
+txn_0286,2026-06-28,-14.41,MCDONALD'S #1842 SAN FRANCISCO,mcdonalds,dining,False,False,baseline
+txn_0287,2026-06-29,-5.41,STARBUCKS COFFEE #6553,starbucks,dining,False,False,baseline
+txn_0288,2026-06-29,-7.58,STARBUCKS COFFEE #4522,starbucks,dining,False,False,baseline
+txn_0289,2026-06-30,-6.27,SQ *SQ *STARBUCKS 2323,starbucks,dining,False,False,baseline
+txn_0290,2026-06-30,-75.0,ATT MOBILE PAYMENT 8205,att,utilities,True,False,baseline
+txn_0291,2026-06-30,-95.6,ELECTRIC COMPANY BILL 5500,electric,utilities,True,False,baseline

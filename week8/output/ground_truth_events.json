@@ -1,0 +1,83 @@
+{
+  "patterns": {
+    "dining_spike": {
+      "month": 4,
+      "category": "dining",
+      "multiplier": 2.5,
+      "description": "Dining spending increases 150% due to social events"
+    },
+    "grocery_drift": {
+      "start_month": 4,
+      "category": "groceries",
+      "monthly_increase_pct": 0.1,
+      "description": "Grocery spending increases 10% monthly for 3 months"
+    },
+    "anomaly_transaction": {
+      "month": 5,
+      "day": 15,
+      "category": "shopping",
+      "multiplier": 3.5,
+      "description": "Single large purchase (electronics) - 3.5x normal"
+    },
+    "savings_drop": {
+      "month": 5,
+      "income_reduction": 0.2,
+      "spending_increase": 0.15,
+      "description": "Savings rate drops from ~20% to ~12%"
+    }
+  },
+  "user_goals": {
+    "dining_budget": {
+      "limit": 400,
+      "period": "monthly"
+    },
+    "grocery_budget": {
+      "limit": 600,
+      "period": "monthly"
+    },
+    "savings_rate": {
+      "target": 0.2,
+      "period": "monthly"
+    }
+  },
+  "expected_detections": [
+    {
+      "type": "spike",
+      "month": 4,
+      "category": "dining",
+      "expected_increase_pct": 150
+    },
+    {
+      "type": "drift",
+      "start_month": 4,
+      "category": "groceries",
+      "months": [
+        4,
+        5,
+        6
+      ],
+      "monthly_increase_pct": 10
+    },
+    {
+      "type": "anomaly",
+      "month": 5,
+      "day": 15,
+      "category": "shopping",
+      "multiplier": 3.5
+    },
+    {
+      "type": "savings_drop",
+      "month": 5,
+      "expected_rate_before": 0.2,
+      "expected_rate_after": 0.12
+    }
+  ],
+  "metadata": {
+    "total_transactions": 291,
+    "date_range": {
+      "start": "2026-01-01",
+      "end": "2026-06-30"
+    },
+    "generation_date": "2026-04-03"
+  }
+}

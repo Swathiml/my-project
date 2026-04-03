@@ -1,0 +1,35 @@
+{
+  "total_transactions": 50,
+  "category_distribution": {
+    "subscriptions": 14,
+    "food and dining": 7,
+    "fees": 7,
+    "income": 6,
+    "transportation": 6,
+    "shopping": 3,
+    "groceries": 3,
+    "travel": 2,
+    "healthcare": 2
+  },
+  "confidence_distribution": {
+    "low": 20,
+    "medium": 17,
+    "high": 13
+  },
+  "avg_confidence": 0.5675520000000001,
+  "transaction_types": {
+    "repeat": 25,
+    "recurring": 17,
+    "one-time": 8
+  },
+  "accuracy": 0.64,
+  "misclassifications": 18,
+  "low_confidence_count": 20,
+  "low_confidence_by_category": {
+    "subscriptions": 7,
+    "fees": 6,
+    "food and dining": 3,
+    "travel": 2,
+    "transportation": 2
+  }
+}
