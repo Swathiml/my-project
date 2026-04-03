@@ -1,6 +1,7 @@
 import pandas as pd
 import re
 import spacy
+import os
 from transformers import pipeline
 from rapidfuzz import fuzz, process
 
@@ -354,8 +355,12 @@ class TransactionPipeline:
         
         return results
     
-    def process(self, input_file='data/sample_transactions.csv', 
-                output_file='week2/week2_deliverable.csv'):
+    def process(self, input_file=None, 
+                output_file=None):
+        if input_file is None:
+            input_file = os.path.join(os.path.dirname(__file__), '..', 'data', 'sample_transactions.csv')
+        if output_file is None:
+            output_file = os.path.join(os.path.dirname(__file__), 'week2_deliverable.csv')
         
         print(f"\nProcessing {input_file}...")
         df = pd.read_csv(input_file)
