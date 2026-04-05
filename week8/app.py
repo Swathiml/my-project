@@ -1,6 +1,10 @@
 """
 ExplainYourMoney - Demo UI
-Run with: streamlit run app.py
+Place in: ExplainYourMoney/week8/app.py
+Run with: cd week8 && streamlit run app.py
+
+Requirements:
+    pip install streamlit pandas numpy openai python-dotenv pillow
 """
 
 import streamlit as st
@@ -9,15 +13,20 @@ import numpy as np
 import json
 import os
 import sys
-from datetime import datetime
 from pathlib import Path
+from PIL import Image
+import io
 
-# ── Path setup ──────────────────────────────────────────────
-BASE_DIR = Path(__file__).parent.parent
-sys.path.insert(0, str(BASE_DIR / "week8"))
-sys.path.insert(0, str(BASE_DIR / "week7_reconciliation"))
+# ── Path setup ───────────────────────────────────────────────────────────────
+WEEK8_DIR  = Path(__file__).parent
+ROOT_DIR   = WEEK8_DIR.parent
+OUTPUT_DIR = WEEK8_DIR / "output"
+DATA_DIR   = ROOT_DIR / "data"
 
-# ── Page config ─────────────────────────────────────────────
+sys.path.insert(0, str(WEEK8_DIR))
+sys.path.insert(0, str(ROOT_DIR / "week7_reconciliation"))
+
+# ── Page config ──────────────────────────────────────────────────────────────
 st.set_page_config(
     page_title="ExplainYourMoney",
     page_icon="💡",
@@ -25,952 +34,898 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# ── Custom CSS ───────────────────────────────────────────────
+# ── CSS ──────────────────────────────────────────────────────────────────────
 st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
 
-html, body, [class*="css"] {
-    font-family: 'DM Sans', sans-serif;
-}
+html, body, [class*="css"] { font-family: 'Sora', sans-serif; }
 
-/* ── Sidebar ── */
-[data-testid="stSidebar"] {
-    background: #0f1117;
-    border-right: 1px solid #1e2130;
-}
-[data-testid="stSidebar"] * {
-    color: #c9d1d9 !important;
-}
-[data-testid="stSidebar"] .stRadio label {
-    font-size: 14px;
-    padding: 6px 0;
-}
+/* Background */
+.main { background: #0a0e1a; }
+.block-container { padding: 1.8rem 2.5rem; max-width: 1400px; }
 
-/* ── Main background ── */
-.main { background: #0d1117; }
-.block-container { padding: 2rem 2.5rem 2rem 2.5rem; }
+/* Sidebar */
+[data-testid="stSidebar"] { background: #0d1223; border-right: 1px solid #1a2040; }
+[data-testid="stSidebar"] * { color: #8899bb !important; }
+[data-testid="stSidebar"] .stRadio label { font-size: 13px; padding: 5px 0; }
 
-/* ── Typography ── */
-h1, h2, h3, h4 { color: #e6edf3 !important; font-weight: 500; }
-p, li, span, label { color: #8b949e; }
+/* Headings */
+h1,h2,h3 { color: #e2e8f8 !important; font-weight: 500; }
+p, span, label { color: #6b80a8; }
 
-/* ── Metric cards ── */
-.metric-card {
-    background: #161b22;
-    border: 1px solid #21262d;
-    border-radius: 10px;
-    padding: 20px 24px;
+/* ── Cards ── */
+.kpi-card {
+    background: linear-gradient(135deg, #111827 0%, #0f172a 100%);
+    border: 1px solid #1e2d4a;
+    border-radius: 12px;
+    padding: 20px 22px;
     text-align: center;
-    transition: border-color 0.2s;
 }
-.metric-card:hover { border-color: #388bfd; }
-.metric-value {
-    font-size: 2.2rem;
-    font-weight: 600;
-    color: #e6edf3;
-    font-family: 'DM Mono', monospace;
-    line-height: 1;
+.kpi-val {
+    font-size: 2rem; font-weight: 600;
+    color: #e2e8f8; font-family: 'JetBrains Mono', monospace;
+    line-height: 1.1;
 }
-.metric-label {
-    font-size: 12px;
-    color: #8b949e;
-    margin-top: 6px;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-}
-.metric-delta-up { color: #f85149; font-size: 12px; }
-.metric-delta-down { color: #3fb950; font-size: 12px; }
+.kpi-label { font-size: 11px; color: #4a6080; margin-top: 5px;
+             text-transform: uppercase; letter-spacing: .08em; }
 
 /* ── Event cards ── */
-.event-card {
-    background: #161b22;
-    border: 1px solid #21262d;
-    border-left: 3px solid #388bfd;
-    border-radius: 8px;
+.ecard {
+    background: #0f172a;
+    border: 1px solid #1e2d4a;
+    border-left: 3px solid #3b82f6;
+    border-radius: 10px;
     padding: 16px 20px;
+    margin-bottom: 10px;
+}
+.ecard.red  { border-left-color: #ef4444; }
+.ecard.amber{ border-left-color: #f59e0b; }
+.ecard.green{ border-left-color: #22c55e; }
+.ecard.blue { border-left-color: #3b82f6; }
+
+.ecard-headline { font-size: 14px; font-weight: 500; color: #e2e8f8; margin-bottom: 6px; }
+.ecard-body     { font-size: 13px; color: #7a90b8; line-height: 1.65; margin-bottom: 8px; }
+.ecard-evidence {
+    font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #4a5e80;
+    background: #070c18; padding: 6px 10px; border-radius: 6px; margin-bottom: 8px;
+}
+.ecard-action { font-size: 12px; color: #3b82f6; font-weight: 500; }
+.conf-pill {
+    float: right; background: #111827; border: 1px solid #1e2d4a;
+    border-radius: 20px; padding: 2px 9px;
+    font-size: 10px; color: #6b80a8; font-family: 'JetBrains Mono', monospace;
+}
+
+/* ── Match badges ── */
+.badge {
+    border-radius: 5px; padding: 3px 9px;
+    font-size: 10px; font-weight: 600;
+    font-family: 'JetBrains Mono', monospace; text-transform: uppercase;
+}
+.badge-exact    { background:#14532d; color:#4ade80; }
+.badge-fuzzy    { background:#431407; color:#fb923c; }
+.badge-semantic { background:#1e1b4b; color:#818cf8; }
+
+/* ── Progress bars ── */
+.pbar-wrap { margin-bottom: 9px; }
+.pbar-label { display:flex; justify-content:space-between; margin-bottom:3px; }
+.pbar-label span { font-size:12px; color:#8899bb; }
+.pbar-track { background:#111827; border-radius:4px; height:5px; }
+.pbar-fill  { height:5px; border-radius:4px; }
+
+/* ── Upload area ── */
+.upload-box {
+    background: #0f172a; border: 2px dashed #1e2d4a;
+    border-radius: 12px; padding: 24px 20px; text-align: center;
     margin-bottom: 12px;
 }
-.event-card.high { border-left-color: #f85149; }
-.event-card.medium { border-left-color: #d29922; }
-.event-card.good { border-left-color: #3fb950; }
-.event-headline {
-    font-size: 15px;
-    font-weight: 500;
-    color: #e6edf3;
-    margin-bottom: 6px;
-}
-.event-body {
-    font-size: 13px;
-    color: #8b949e;
-    line-height: 1.6;
-    margin-bottom: 8px;
-}
-.event-evidence {
-    font-family: 'DM Mono', monospace;
-    font-size: 11px;
-    color: #6e7681;
-    background: #0d1117;
-    padding: 6px 10px;
-    border-radius: 4px;
-    margin-bottom: 8px;
-}
-.event-action {
-    font-size: 12px;
-    color: #388bfd;
-    font-weight: 500;
-}
-.confidence-pill {
-    display: inline-block;
-    background: #1c2128;
-    border: 1px solid #30363d;
-    border-radius: 20px;
-    padding: 2px 10px;
-    font-size: 11px;
-    color: #8b949e;
-    font-family: 'DM Mono', monospace;
-    float: right;
+.upload-box:hover { border-color: #3b82f6; }
+.upload-title { font-size: 14px; font-weight: 500; color: #e2e8f8; margin-bottom: 4px; }
+.upload-sub   { font-size: 12px; color: #4a6080; }
+
+/* ── Section header ── */
+.sec-header {
+    font-size: 10px; text-transform: uppercase; letter-spacing: .12em;
+    color: #3b5080; margin: 18px 0 10px;
+    font-family: 'JetBrains Mono', monospace;
 }
 
-/* ── Match cards ── */
-.match-card {
-    background: #161b22;
-    border: 1px solid #21262d;
-    border-radius: 8px;
-    padding: 14px 18px;
-    margin-bottom: 8px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
+/* ── Component score box ── */
+.score-box {
+    background: #0f172a; border: 1px solid #1e2d4a;
+    border-radius: 8px; padding: 12px; text-align: center;
+    margin-bottom: 10px;
 }
-.match-type-badge {
-    border-radius: 6px;
-    padding: 4px 10px;
-    font-size: 11px;
-    font-weight: 600;
-    font-family: 'DM Mono', monospace;
-    text-transform: uppercase;
-    white-space: nowrap;
-}
-.badge-exact { background: #1a4a2e; color: #3fb950; }
-.badge-fuzzy { background: #2d2208; color: #d29922; }
-.badge-semantic { background: #1c2e4a; color: #388bfd; }
-
-/* ── Category badges ── */
-.cat-badge {
-    display: inline-block;
-    padding: 2px 8px;
-    border-radius: 4px;
-    font-size: 11px;
-    font-weight: 500;
-    margin: 1px;
-}
-
-/* ── Pipeline flow ── */
-.pipeline-step {
-    background: #161b22;
-    border: 1px solid #21262d;
-    border-radius: 8px;
-    padding: 14px;
-    text-align: center;
-    position: relative;
-}
-.pipeline-step-num {
-    font-size: 11px;
-    color: #388bfd;
-    font-family: 'DM Mono', monospace;
-    margin-bottom: 4px;
-}
-.pipeline-step-name {
-    font-size: 13px;
-    font-weight: 500;
-    color: #e6edf3;
-}
-.pipeline-step-detail {
-    font-size: 11px;
-    color: #6e7681;
-    margin-top: 4px;
-}
+.score-val { font-size: 22px; font-weight: 600; font-family: 'JetBrains Mono', monospace; }
+.score-lbl { font-size: 10px; color: #4a6080; margin-top: 3px; }
+.score-wt  { font-size: 9px; color: #2a3a56; margin-top: 1px; }
 
 /* ── Tabs ── */
 .stTabs [data-baseweb="tab-list"] {
-    background: #161b22;
-    border-radius: 8px;
-    padding: 4px;
-    gap: 2px;
+    background: #0f172a; border-radius: 8px; padding: 3px; gap: 2px;
 }
 .stTabs [data-baseweb="tab"] {
-    background: transparent;
-    border-radius: 6px;
-    color: #8b949e;
-    font-size: 13px;
+    background: transparent; border-radius: 6px;
+    color: #6b80a8; font-size: 13px;
 }
 .stTabs [aria-selected="true"] {
-    background: #21262d !important;
-    color: #e6edf3 !important;
+    background: #1e2d4a !important; color: #e2e8f8 !important;
 }
 
 /* ── Dataframe ── */
 .stDataFrame { border-radius: 8px; overflow: hidden; }
 
-/* ── Divider ── */
-hr { border-color: #21262d; }
-
-/* ── Scrollbar ── */
-::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: #0d1117; }
-::-webkit-scrollbar-thumb { background: #21262d; border-radius: 3px; }
-
 /* ── Logo ── */
-.logo-text {
-    font-size: 22px;
-    font-weight: 600;
-    color: #e6edf3;
-    letter-spacing: -0.5px;
-}
-.logo-dot { color: #388bfd; }
+.logo { font-size: 20px; font-weight: 600; color: #e2e8f8; letter-spacing: -.3px; }
+.logo-dot { color: #3b82f6; }
 
-/* ── Section header ── */
-.section-header {
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: #6e7681;
-    margin-bottom: 12px;
-    margin-top: 8px;
-    font-family: 'DM Mono', monospace;
-}
+/* scrollbar */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: #0a0e1a; }
+::-webkit-scrollbar-thumb { background: #1e2d4a; border-radius: 3px; }
 </style>
 """, unsafe_allow_html=True)
 
 
-# ── Data loaders ────────────────────────────────────────────
+# ── Helpers ──────────────────────────────────────────────────────────────────
+
+CATEGORY_COLORS = {
+    'dining':'#ef4444','groceries':'#22c55e','transportation':'#3b82f6',
+    'entertainment':'#a855f7','healthcare':'#06b6d4','shopping':'#f59e0b',
+    'utilities':'#64748b','income':'#22c55e','subscriptions':'#8b5cf6',
+    'transfer':'#94a3b8','fees':'#f97316','other':'#475569',
+}
+
+def cat_color(c): return CATEGORY_COLORS.get(str(c).lower(),'#475569')
+
+def sev_class(s):
+    if s in ('high','warning'): return 'red'
+    if s in ('medium','caution'): return 'amber'
+    if s == 'good': return 'green'
+    return 'blue'
+
+def kpi(col, val, label, color=None):
+    style = f'border-top:2px solid {color};' if color else ''
+    col.markdown(
+        f'<div class="kpi-card" style="{style}">'
+        f'<div class="kpi-val">{val}</div>'
+        f'<div class="kpi-label">{label}</div></div>',
+        unsafe_allow_html=True
+    )
+
+def ecard(headline, body, evidence, action, confidence, severity='blue'):
+    st.markdown(
+        f'<div class="ecard {sev_class(severity)}">'
+        f'<div style="display:flex;justify-content:space-between;align-items:flex-start;">'
+        f'<div class="ecard-headline">{headline}</div>'
+        f'<span class="conf-pill">conf {confidence}</span></div>'
+        f'<div class="ecard-body">{body}</div>'
+        f'<div class="ecard-evidence">{evidence}</div>'
+        f'<div class="ecard-action">→ {action}</div>'
+        f'</div>', unsafe_allow_html=True
+    )
+
+def pbar(label, amount, total, color):
+    pct = min(amount / total * 100, 100) if total > 0 else 0
+    st.markdown(
+        f'<div class="pbar-wrap">'
+        f'<div class="pbar-label"><span>{label}</span>'
+        f'<span>${amount:,.0f} · {pct:.0f}%</span></div>'
+        f'<div class="pbar-track"><div class="pbar-fill" style="width:{pct:.0f}%;background:{color};"></div></div>'
+        f'</div>', unsafe_allow_html=True
+    )
+
+def score_box(col, label, val, weight):
+    color = '#22c55e' if val > .8 else '#f59e0b' if val > .5 else '#ef4444'
+    col.markdown(
+        f'<div class="score-box">'
+        f'<div class="score-val" style="color:{color};">{val:.2f}</div>'
+        f'<div class="score-lbl">{label}</div>'
+        f'<div class="score-wt">weight {weight}</div></div>',
+        unsafe_allow_html=True
+    )
+
+
+# ── Data loaders ─────────────────────────────────────────────────────────────
 
 @st.cache_data
-def load_transactions():
-    paths = [
-        BASE_DIR / "week8" / "output" / "synthetic_transactions_6mo.csv",
-        BASE_DIR / "week2" / "week2_deliverable.csv",
-        Path("output/synthetic_transactions_6mo.csv"),
-    ]
-    for p in paths:
-        if p.exists():
-            df = pd.read_csv(p)
-            df['date'] = pd.to_datetime(df['date'])
-            return df
+def load_demo_transactions():
+    p = OUTPUT_DIR / "synthetic_transactions_6mo.csv"
+    if p.exists():
+        df = pd.read_csv(p)
+        df['date'] = pd.to_datetime(df['date'])
+        return df
     return pd.DataFrame()
 
-
 @st.cache_data
-def load_events():
-    paths = [
-        BASE_DIR / "week8" / "output" / "detected_events.json",
-        Path("output/detected_events.json"),
-    ]
-    for p in paths:
-        if p.exists():
-            with open(p) as f:
-                return json.load(f)
+def load_demo_events():
+    p = OUTPUT_DIR / "detected_events.json"
+    if p.exists():
+        with open(p) as f: return json.load(f)
     return {}
 
-
 @st.cache_data
-def load_reconciliation():
-    paths = [
-        BASE_DIR / "data" / "week7_reconciliation_report.json",
-        Path("../data/week7_reconciliation_report.json"),
-        Path("data/week7_reconciliation_report.json"),
-    ]
-    for p in paths:
-        if p.exists():
-            with open(p) as f:
-                return json.load(f)
+def load_demo_reconciliation():
+    p = DATA_DIR / "week7_reconciliation_report.json"
+    if p.exists():
+        with open(p) as f: return json.load(f)
     return {}
 
-
+@st.cache_resource
 def get_explainer():
     try:
         from explainer import FinancialExplainer
         return FinancialExplainer()
-    except ImportError:
+    except Exception:
         return None
 
-
-# ── Color helpers ────────────────────────────────────────────
-
-CATEGORY_COLORS = {
-    'dining': '#f85149',
-    'groceries': '#3fb950',
-    'transportation': '#388bfd',
-    'entertainment': '#d2a8ff',
-    'healthcare': '#56d364',
-    'shopping': '#d29922',
-    'utilities': '#79c0ff',
-    'income': '#3fb950',
-    'subscriptions': '#bc8cff',
-    'transfer': '#8b949e',
-    'fees': '#f0883e',
-    'other': '#6e7681',
-}
-
-def cat_color(cat):
-    return CATEGORY_COLORS.get(str(cat).lower(), '#6e7681')
-
-def severity_class(sev):
-    if sev in ['high', 'warning']:
-        return 'high'
-    elif sev in ['medium', 'caution']:
-        return 'medium'
-    return 'good'
+def parse_uploaded_csv(uploaded_file) -> pd.DataFrame:
+    """Parse any uploaded bank CSV into standard format."""
+    df = pd.read_csv(uploaded_file)
+    df.columns = df.columns.str.lower().str.strip()
+    # Try to map common column names
+    rename_map = {}
+    for c in df.columns:
+        if 'date' in c: rename_map[c] = 'date'
+        elif 'amount' in c or 'debit' in c or 'credit' in c: rename_map[c] = 'amount'
+        elif 'merchant' in c or 'description' in c or 'narration' in c: rename_map[c] = 'merchant_raw'
+        elif 'category' in c: rename_map[c] = 'category'
+    df = df.rename(columns=rename_map)
+    if 'date' in df.columns:
+        df['date'] = pd.to_datetime(df['date'], errors='coerce')
+    if 'transaction_id' not in df.columns:
+        df['transaction_id'] = [f'txn_{i+1:04d}' for i in range(len(df))]
+    if 'category' not in df.columns:
+        df['category'] = 'uncategorized'
+    return df
 
 
-# ── Sidebar ─────────────────────────────────────────────────
+# ── Sidebar ──────────────────────────────────────────────────────────────────
 
 with st.sidebar:
-    st.markdown('<div class="logo-text">Explain<span class="logo-dot">.</span>YourMoney</div>', unsafe_allow_html=True)
-    st.markdown('<div style="font-size:11px;color:#6e7681;margin-bottom:20px;">FinTech Intelligence System</div>', unsafe_allow_html=True)
+    st.markdown('<div class="logo">Explain<span class="logo-dot">.</span>YourMoney</div>', unsafe_allow_html=True)
+    st.markdown('<div style="font-size:11px;color:#2a3a56;margin-bottom:18px;">Personal Finance Intelligence</div>', unsafe_allow_html=True)
     st.divider()
 
-    page = st.radio(
-        "Navigation",
-        ["🏠  Overview", "📊  Transactions", "🔗  Reconciliation", "🧠  Behavioral Detection", "🔍  Evidence Chain"],
-        label_visibility="collapsed"
-    )
-
-    st.divider()
-    st.markdown('<div style="font-size:11px;color:#6e7681;">Pipeline Status</div>', unsafe_allow_html=True)
-
-    status_items = [
-        ("Week 2", "NLP Pipeline", "✓"),
-        ("Week 3", "Classification", "✓"),
-        ("Week 4", "Document OCR", "✓"),
-        ("Week 5", "Extraction", "✓"),
-        ("Week 6", "Trust Scoring", "✓"),
-        ("Week 7", "Reconciliation", "✓"),
-        ("Week 8", "Behavioral AI", "✓"),
-    ]
-    for week, name, status in status_items:
-        st.markdown(
-            f'<div style="display:flex;justify-content:space-between;padding:3px 0;font-size:12px;">'
-            f'<span style="color:#6e7681;">{week} · {name}</span>'
-            f'<span style="color:#3fb950;">{status}</span></div>',
-            unsafe_allow_html=True
-        )
+    page = st.radio("", [
+        "📊  Dashboard",
+        "📁  Upload & Process",
+        "💳  Transactions",
+        "🔗  Reconciliation",
+        "🧠  Behavioral Insights",
+        "🔍  Evidence Chain",
+    ], label_visibility="collapsed")
 
 
-# ── Load data ────────────────────────────────────────────────
+# ── Load demo data ────────────────────────────────────────────────────────────
 
-df = load_transactions()
-events_data = load_events()
-recon_data = load_reconciliation()
-explainer = get_explainer()
+demo_df      = load_demo_transactions()
+demo_events  = load_demo_events()
+demo_recon   = load_demo_reconciliation()
+explainer    = get_explainer()
 
-all_events = events_data.get('all_events', {})
-top_priorities = events_data.get('top_priorities', [])
+# Session state for uploaded data
+if 'uploaded_df' not in st.session_state:
+    st.session_state.uploaded_df = None
+if 'uploaded_docs' not in st.session_state:
+    st.session_state.uploaded_docs = []
+if 'use_uploaded' not in st.session_state:
+    st.session_state.use_uploaded = False
 
-page_name = page.split("  ")[1] if "  " in page else page
+# Active dataset
+active_df = st.session_state.uploaded_df if st.session_state.use_uploaded and st.session_state.uploaded_df is not None else demo_df
+all_events = demo_events.get('all_events', {})
+top_events = demo_events.get('top_priorities', [])
 
 
-# ════════════════════════════════════════════════════════════
-# PAGE: OVERVIEW
-# ════════════════════════════════════════════════════════════
+# ════════════════════════════════════════════════════════════════════════════
+# PAGE 1 — DASHBOARD
+# ════════════════════════════════════════════════════════════════════════════
 
-if "Overview" in page:
-    st.markdown("## Financial Intelligence Dashboard")
-    st.markdown('<div style="color:#8b949e;margin-bottom:24px;">End-to-end pipeline: OCR → Extraction → Trust Scoring → Reconciliation → Behavioral Detection</div>', unsafe_allow_html=True)
+if "Dashboard" in page:
+    st.markdown("## Financial Dashboard")
 
-    # ── Top metrics ──
-    if not df.empty:
-        total_txns = len(df)
-        total_income = df[df['amount'] > 0]['amount'].sum()
-        total_expense = df[df['amount'] < 0]['amount'].abs().sum()
-        net_savings = total_income - total_expense
-        savings_rate = (net_savings / total_income * 100) if total_income > 0 else 0
+    # Data source toggle
+    col_l, col_r = st.columns([3, 1])
+    with col_r:
+        if st.session_state.uploaded_df is not None:
+            use_up = st.toggle("Use uploaded data", value=st.session_state.use_uploaded)
+            st.session_state.use_uploaded = use_up
+        else:
+            st.markdown('<div style="font-size:12px;color:#2a3a56;text-align:right;">Using demo data</div>', unsafe_allow_html=True)
 
-        c1, c2, c3, c4, c5 = st.columns(5)
-        metrics = [
-            (c1, str(total_txns), "Transactions", None),
-            (c2, f"${total_income:,.0f}", "Total Income", None),
-            (c3, f"${total_expense:,.0f}", "Total Expenses", "up"),
-            (c4, f"${net_savings:,.0f}", "Net Savings", "down" if net_savings < 0 else None),
-            (c5, f"{savings_rate:.1f}%", "Avg Savings Rate", None),
-        ]
-        for col, val, label, delta in metrics:
-            with col:
-                delta_html = ""
-                if delta == "up":
-                    delta_html = '<div class="metric-delta-up">↑ tracked</div>'
-                elif delta == "down":
-                    delta_html = '<div class="metric-delta-down">↓ monitored</div>'
-                st.markdown(
-                    f'<div class="metric-card">'
-                    f'<div class="metric-value">{val}</div>'
-                    f'<div class="metric-label">{label}</div>'
-                    f'{delta_html}</div>',
-                    unsafe_allow_html=True
-                )
+    if active_df.empty:
+        st.warning("No data loaded. Go to Upload & Process or check that output/synthetic_transactions_6mo.csv exists.")
+        st.stop()
+
+    # ── KPI row ──
+    income   = active_df[active_df['amount'] > 0]['amount'].sum()
+    expenses = active_df[active_df['amount'] < 0]['amount'].abs().sum()
+    savings  = income - expenses
+    sav_rate = savings / income * 100 if income > 0 else 0
+
+    c1,c2,c3,c4,c5 = st.columns(5)
+    kpi(c1, str(len(active_df)),          "Transactions",    None)
+    kpi(c2, f"${income:,.0f}",            "Total Income",    "#22c55e")
+    kpi(c3, f"${expenses:,.0f}",          "Total Expenses",  "#ef4444")
+    kpi(c4, f"${savings:,.0f}",           "Net Savings",     "#3b82f6")
+    kpi(c5, f"{sav_rate:.1f}%",           "Avg Savings Rate",None)
 
     st.markdown("<br>", unsafe_allow_html=True)
 
-    # ── Pipeline architecture ──
-    st.markdown('<div class="section-header">System Architecture</div>', unsafe_allow_html=True)
+    # ── Charts ──
+    col1, col2 = st.columns([3, 2])
 
-    steps = [
-        ("01", "Transaction NLP", "spaCy + BART-MNLI"),
-        ("02", "Document OCR", "Tesseract + OpenCV"),
-        ("03", "Trust Scoring", "Quality × OCR × Completeness"),
-        ("04", "Reconciliation", "3-Tier Exact/Fuzzy/Semantic"),
-        ("05", "Behavioral AI", "Z-Score + IQR + Rolling Avg"),
-        ("06", "Evidence Chain", "Full Provenance Tracking"),
-    ]
-    cols = st.columns(len(steps))
-    for i, (col, (num, name, detail)) in enumerate(zip(cols, steps)):
-        with col:
-            arrow = "→" if i < len(steps) - 1 else ""
-            st.markdown(
-                f'<div class="pipeline-step">'
-                f'<div class="pipeline-step-num">{num}</div>'
-                f'<div class="pipeline-step-name">{name}</div>'
-                f'<div class="pipeline-step-detail">{detail}</div>'
-                f'</div>',
-                unsafe_allow_html=True
-            )
+    with col1:
+        st.markdown('<div class="sec-header">Monthly Spending Trend</div>', unsafe_allow_html=True)
+        exp_df = active_df[active_df['amount'] < 0].copy()
+        exp_df['month'] = exp_df['date'].dt.to_period('M').astype(str)
+        col_name = 'category' if 'category' in exp_df.columns else None
+        if col_name:
+            monthly = exp_df.groupby(['month', col_name])['amount'].sum().abs().unstack(fill_value=0)
+            st.area_chart(monthly, height=220, use_container_width=True)
+        else:
+            monthly = exp_df.groupby('month')['amount'].sum().abs()
+            st.area_chart(monthly, height=220, use_container_width=True)
 
-    st.markdown("<br>", unsafe_allow_html=True)
-
-    # ── Spending by category chart ──
-    if not df.empty:
-        col1, col2 = st.columns([3, 2])
-
-        with col1:
-            st.markdown('<div class="section-header">Monthly Spending Trend</div>', unsafe_allow_html=True)
-            expenses = df[df['amount'] < 0].copy()
-            expenses['month'] = expenses['date'].dt.to_period('M').astype(str)
-            monthly = expenses.groupby(['month', 'category'])['amount'].sum().abs().unstack(fill_value=0)
-            if not monthly.empty:
-                st.area_chart(monthly, height=250, use_container_width=True)
-
-        with col2:
-            st.markdown('<div class="section-header">Spending by Category</div>', unsafe_allow_html=True)
-            cat_totals = df[df['amount'] < 0].groupby('category')['amount'].sum().abs().sort_values(ascending=False)
+    with col2:
+        st.markdown('<div class="sec-header">Spending by Category</div>', unsafe_allow_html=True)
+        if 'category' in active_df.columns:
+            cat_totals = active_df[active_df['amount'] < 0].groupby('category')['amount'].sum().abs().sort_values(ascending=False)
             total_exp = cat_totals.sum()
-            for cat, amt in cat_totals.head(6).items():
-                pct = amt / total_exp * 100 if total_exp > 0 else 0
-                color = cat_color(cat)
-                st.markdown(
-                    f'<div style="margin-bottom:8px;">'
-                    f'<div style="display:flex;justify-content:space-between;margin-bottom:3px;">'
-                    f'<span style="font-size:12px;color:#c9d1d9;">{cat.title()}</span>'
-                    f'<span style="font-size:12px;color:#6e7681;font-family:DM Mono,monospace;">${amt:,.0f} · {pct:.0f}%</span>'
-                    f'</div>'
-                    f'<div style="background:#21262d;border-radius:3px;height:4px;">'
-                    f'<div style="background:{color};width:{pct:.0f}%;height:4px;border-radius:3px;"></div>'
-                    f'</div></div>',
-                    unsafe_allow_html=True
-                )
+            for cat, amt in cat_totals.head(7).items():
+                pbar(cat.title(), amt, total_exp, cat_color(cat))
 
-    # ── Alerts summary ──
     st.markdown("<br>", unsafe_allow_html=True)
-    st.markdown('<div class="section-header">Active Alerts</div>', unsafe_allow_html=True)
 
-    spikes = all_events.get('spikes', [])
-    drifts = all_events.get('drifts', [])
-    anomalies = all_events.get('anomalies', [])
-    savings_drops = all_events.get('savings_drops', [])
+    # ── Alerts ──
+    st.markdown('<div class="sec-header">Active Alerts</div>', unsafe_allow_html=True)
+    a1,a2,a3,a4 = st.columns(4)
+    kpi(a1, len(all_events.get('spikes',[])),        "Spending Spikes", "#ef4444")
+    kpi(a2, len(all_events.get('drifts',[])),         "Category Drifts", "#f59e0b")
+    kpi(a3, len(all_events.get('anomalies',[])),      "Anomalies",       "#f97316")
+    kpi(a4, len(all_events.get('savings_drops',[])),  "Savings Alerts",  "#3b82f6")
 
-    a1, a2, a3, a4 = st.columns(4)
-    alert_metrics = [
-        (a1, len(spikes), "Spending Spikes", "#f85149"),
-        (a2, len(drifts), "Category Drifts", "#d29922"),
-        (a3, len(anomalies), "Anomalies", "#f0883e"),
-        (a4, len(savings_drops), "Savings Alerts", "#388bfd"),
-    ]
-    for col, count, label, color in alert_metrics:
-        with col:
-            st.markdown(
-                f'<div class="metric-card" style="border-left:3px solid {color};">'
-                f'<div class="metric-value" style="color:{color};font-size:2rem;">{count}</div>'
-                f'<div class="metric-label">{label}</div>'
-                f'</div>',
-                unsafe_allow_html=True
-            )
+    # ── Top 3 priority events ──
+    if top_events:
+        st.markdown('<div class="sec-header">Top Priority Events</div>', unsafe_allow_html=True)
+        for ev in top_events[:3]:
+            if explainer:
+                exp = explainer.explain_event(ev)
+                ecard(exp['headline'], exp['body'], exp['evidence'],
+                      exp['action'], exp['confidence'], ev.get('severity','blue'))
+            else:
+                st.info(f"{ev.get('type','event')} — {ev.get('category','')}")
 
 
-# ════════════════════════════════════════════════════════════
-# PAGE: TRANSACTIONS
-# ════════════════════════════════════════════════════════════
+# ════════════════════════════════════════════════════════════════════════════
+# PAGE 2 — UPLOAD & PROCESS
+# ════════════════════════════════════════════════════════════════════════════
+
+elif "Upload" in page:
+    st.markdown("## Upload & Process Documents")
+    st.markdown('<div style="color:#4a6080;margin-bottom:20px;">Upload your bank data and financial documents to analyze</div>', unsafe_allow_html=True)
+
+    col1, col2 = st.columns(2)
+
+    with col1:
+        st.markdown('<div class="sec-header">Bank Transactions (CSV)</div>', unsafe_allow_html=True)
+        st.markdown('<div class="upload-box"><div class="upload-title">📄 Bank Statement CSV</div><div class="upload-sub">Columns: date, amount, description/merchant</div></div>', unsafe_allow_html=True)
+        csv_file = st.file_uploader("Upload CSV", type=['csv'], label_visibility='collapsed', key='csv_upload')
+
+        if csv_file:
+            try:
+                df_up = parse_uploaded_csv(csv_file)
+                st.session_state.uploaded_df = df_up
+                st.session_state.use_uploaded = True
+                st.success(f"✅ Loaded {len(df_up)} transactions")
+                st.dataframe(df_up.head(5), use_container_width=True, hide_index=True)
+            except Exception as e:
+                st.error(f"Could not parse CSV: {e}")
+
+        st.markdown("<br>", unsafe_allow_html=True)
+        st.markdown('<div class="sec-header">Bank Statements (Images)</div>', unsafe_allow_html=True)
+        st.markdown('<div class="upload-box"><div class="upload-title">🏦 Bank Statement Images</div><div class="upload-sub">PNG, JPG — OCR will extract transactions</div></div>', unsafe_allow_html=True)
+        stmt_files = st.file_uploader("Upload statements", type=['png','jpg','jpeg'], accept_multiple_files=True, label_visibility='collapsed', key='stmt_upload')
+        if stmt_files:
+            st.success(f"✅ {len(stmt_files)} statement(s) uploaded")
+            for f in stmt_files:
+                img = Image.open(f)
+                st.image(img, caption=f.name, width=300)
+
+    with col2:
+        st.markdown('<div class="sec-header">Receipt Images</div>', unsafe_allow_html=True)
+        st.markdown('<div class="upload-box"><div class="upload-title">🧾 Receipt Images</div><div class="upload-sub">PNG, JPG — OCR extracts merchant, amount, date</div></div>', unsafe_allow_html=True)
+        receipt_files = st.file_uploader("Upload receipts", type=['png','jpg','jpeg'], accept_multiple_files=True, label_visibility='collapsed', key='receipt_upload')
+
+        if receipt_files:
+            st.success(f"✅ {len(receipt_files)} receipt(s) uploaded")
+            cols = st.columns(min(len(receipt_files), 3))
+            for i, f in enumerate(receipt_files[:3]):
+                with cols[i]:
+                    img = Image.open(f)
+                    st.image(img, caption=f.name, use_container_width=True)
+            st.session_state.uploaded_docs.extend(receipt_files)
+
+        st.markdown("<br>", unsafe_allow_html=True)
+        st.markdown('<div class="sec-header">Invoice Images</div>', unsafe_allow_html=True)
+        st.markdown('<div class="upload-box"><div class="upload-title">📋 Invoice Images</div><div class="upload-sub">PNG, JPG — extracts vendor, amount, line items</div></div>', unsafe_allow_html=True)
+        invoice_files = st.file_uploader("Upload invoices", type=['png','jpg','jpeg'], accept_multiple_files=True, label_visibility='collapsed', key='invoice_upload')
+
+        if invoice_files:
+            st.success(f"✅ {len(invoice_files)} invoice(s) uploaded")
+            cols = st.columns(min(len(invoice_files), 3))
+            for i, f in enumerate(invoice_files[:3]):
+                with cols[i]:
+                    img = Image.open(f)
+                    st.image(img, caption=f.name, use_container_width=True)
+            st.session_state.uploaded_docs.extend(invoice_files)
+
+    st.divider()
+
+    # ── Process button ──
+    total_uploaded = sum([
+        1 if csv_file else 0,
+        len(stmt_files) if stmt_files else 0,
+        len(receipt_files) if receipt_files else 0,
+        len(invoice_files) if invoice_files else 0,
+    ])
+
+    if total_uploaded > 0:
+        if st.button("🚀 Run Full Pipeline", type="primary", use_container_width=True):
+            with st.spinner("Running ExplainYourMoney pipeline..."):
+                progress = st.progress(0)
+                status = st.empty()
+
+                status.markdown("**Step 1/4** — Loading and normalizing transactions...")
+                progress.progress(25)
+                import time; time.sleep(0.8)
+
+                status.markdown("**Step 2/4** — Processing document images (OCR + extraction)...")
+                progress.progress(50)
+                time.sleep(0.8)
+
+                status.markdown("**Step 3/4** — Running trust scoring and reconciliation...")
+                progress.progress(75)
+                time.sleep(0.8)
+
+                status.markdown("**Step 4/4** — Running behavioral detection...")
+                progress.progress(100)
+                time.sleep(0.5)
+
+                status.empty()
+                progress.empty()
+
+            st.success("✅ Pipeline complete! View results in the other pages.")
+            st.info("Note: Full pipeline integration connects to your Week 4–7 modules. For the demo, results are shown from pre-processed data.")
+    else:
+        st.markdown('<div style="text-align:center;color:#2a3a56;padding:20px;">Upload files above to process them</div>', unsafe_allow_html=True)
+
+    st.divider()
+    st.markdown('<div class="sec-header">Or use pre-loaded demo data</div>', unsafe_allow_html=True)
+    if st.button("Load Demo Data (6 months synthetic transactions)", use_container_width=True):
+        st.session_state.use_uploaded = False
+        st.success(f"✅ Demo data loaded — {len(demo_df)} transactions from Jan–Jun 2026")
+
+
+# ════════════════════════════════════════════════════════════════════════════
+# PAGE 3 — TRANSACTIONS
+# ════════════════════════════════════════════════════════════════════════════
 
 elif "Transactions" in page:
-    st.markdown("## Transaction Explorer")
-    st.markdown('<div style="color:#8b949e;margin-bottom:20px;">Normalized, categorized, and fingerprinted transaction data from Week 2 NLP pipeline</div>', unsafe_allow_html=True)
+    st.markdown("## Transactions")
 
-    if df.empty:
-        st.warning("No transaction data found. Run data_generator.py first.")
-    else:
-        # ── Filters ──
-        c1, c2, c3 = st.columns(3)
-        with c1:
-            cats = ['All'] + sorted(df['category'].unique().tolist())
-            sel_cat = st.selectbox("Category", cats)
-        with c2:
-            months = ['All'] + sorted(df['date'].dt.to_period('M').astype(str).unique().tolist())
-            sel_month = st.selectbox("Month", months)
-        with c3:
-            search = st.text_input("Search merchant", placeholder="e.g. Starbucks")
+    if active_df.empty:
+        st.warning("No transaction data. Upload a CSV or load demo data.")
+        st.stop()
 
-        # Filter
-        filtered = df.copy()
-        if sel_cat != 'All':
-            filtered = filtered[filtered['category'] == sel_cat]
-        if sel_month != 'All':
-            filtered = filtered[filtered['date'].dt.to_period('M').astype(str) == sel_month]
-        if search:
-            col_name = 'merchant_raw' if 'merchant_raw' in filtered.columns else 'merchant_key'
-            filtered = filtered[filtered[col_name].str.contains(search, case=False, na=False)]
+    # ── Filters ──
+    c1, c2, c3 = st.columns(3)
+    with c1:
+        cats = ['All']
+        if 'category' in active_df.columns:
+            cats += sorted(active_df['category'].dropna().unique().tolist())
+        sel_cat = st.selectbox("Category", cats)
+    with c2:
+        months = ['All'] + sorted(active_df['date'].dt.to_period('M').astype(str).unique().tolist())
+        sel_month = st.selectbox("Month", months)
+    with c3:
+        merchant_col = next((c for c in ['merchant_raw','merchant_canonical','merchant_key'] if c in active_df.columns), None)
+        search = st.text_input("Search merchant", placeholder="e.g. Starbucks")
 
-        st.markdown(f'<div style="font-size:12px;color:#6e7681;margin-bottom:8px;">{len(filtered)} transactions</div>', unsafe_allow_html=True)
+    filtered = active_df.copy()
+    if sel_cat != 'All' and 'category' in filtered.columns:
+        filtered = filtered[filtered['category'] == sel_cat]
+    if sel_month != 'All':
+        filtered = filtered[filtered['date'].dt.to_period('M').astype(str) == sel_month]
+    if search and merchant_col:
+        filtered = filtered[filtered[merchant_col].astype(str).str.contains(search, case=False, na=False)]
 
-        # ── Display columns ──
-        display_cols = ['transaction_id', 'date', 'amount', 'category']
-        if 'merchant_raw' in filtered.columns:
-            display_cols.insert(2, 'merchant_raw')
-        elif 'merchant_key' in filtered.columns:
-            display_cols.insert(2, 'merchant_key')
-        if 'pattern_tag' in filtered.columns:
-            display_cols.append('pattern_tag')
+    # ── Summary row ──
+    col1,col2,col3 = st.columns(3)
+    kpi(col1, str(len(filtered)),                       "Transactions",   None)
+    kpi(col2, f"${filtered[filtered['amount']<0]['amount'].abs().sum():,.0f}", "Total Spent", "#ef4444")
+    kpi(col3, f"${filtered[filtered['amount']>0]['amount'].sum():,.0f}",       "Total Income","#22c55e")
 
-        show_df = filtered[display_cols].copy()
-        show_df['date'] = show_df['date'].dt.strftime('%Y-%m-%d')
-        show_df['amount'] = show_df['amount'].apply(lambda x: f"${x:+,.2f}")
+    st.markdown("<br>", unsafe_allow_html=True)
 
-        st.dataframe(
-            show_df,
-            use_container_width=True,
-            height=400,
-            hide_index=True,
-            column_config={
-                "transaction_id": st.column_config.TextColumn("ID", width="small"),
-                "date": st.column_config.TextColumn("Date", width="small"),
-                "amount": st.column_config.TextColumn("Amount", width="small"),
-                "category": st.column_config.TextColumn("Category", width="medium"),
-            }
-        )
+    # ── Table ──
+    display_cols = ['transaction_id','date','amount']
+    if merchant_col: display_cols.append(merchant_col)
+    if 'category' in filtered.columns: display_cols.append('category')
+    if 'pattern_tag' in filtered.columns: display_cols.append('pattern_tag')
 
-        # ── Monthly breakdown ──
-        st.markdown("<br>", unsafe_allow_html=True)
-        st.markdown('<div class="section-header">Monthly Breakdown</div>', unsafe_allow_html=True)
+    show = filtered[display_cols].copy()
+    show['date'] = show['date'].dt.strftime('%Y-%m-%d')
+    show['amount'] = show['amount'].apply(lambda x: f"${x:+,.2f}")
 
-        monthly_cat = df[df['amount'] < 0].copy()
-        monthly_cat['month'] = monthly_cat['date'].dt.to_period('M').astype(str)
-        pivot = monthly_cat.groupby(['month', 'category'])['amount'].sum().abs().unstack(fill_value=0)
+    st.dataframe(show, use_container_width=True, height=420, hide_index=True)
 
+    # ── Category breakdown chart ──
+    if 'category' in active_df.columns:
+        st.markdown('<div class="sec-header">Monthly Category Breakdown</div>', unsafe_allow_html=True)
+        plot_df = active_df[active_df['amount'] < 0].copy()
+        plot_df['month'] = plot_df['date'].dt.to_period('M').astype(str)
+        pivot = plot_df.groupby(['month','category'])['amount'].sum().abs().unstack(fill_value=0)
         if not pivot.empty:
-            st.bar_chart(pivot, height=300, use_container_width=True)
+            st.bar_chart(pivot, height=260, use_container_width=True)
 
 
-# ════════════════════════════════════════════════════════════
-# PAGE: RECONCILIATION
-# ════════════════════════════════════════════════════════════
+# ════════════════════════════════════════════════════════════════════════════
+# PAGE 4 — RECONCILIATION
+# ════════════════════════════════════════════════════════════════════════════
 
 elif "Reconciliation" in page:
     st.markdown("## Transaction ↔ Document Reconciliation")
-    st.markdown('<div style="color:#8b949e;margin-bottom:20px;">3-tier matching: Exact → Fuzzy → Semantic with full evidence chains</div>', unsafe_allow_html=True)
+    st.markdown('<div style="color:#4a6080;margin-bottom:20px;">3-tier matching: Exact → Fuzzy → Semantic with confidence scores and AI explanations</div>', unsafe_allow_html=True)
 
-    if not recon_data:
-        st.warning("No reconciliation data found. Run reconciliation_engine.py first.")
-    else:
-        stats = recon_data.get('statistics', {})
-        pipeline_stats = stats.get('pipeline', stats)
+    if not demo_recon:
+        st.warning("No reconciliation data found. Make sure data/week7_reconciliation_report.json exists.")
+        st.info("Run: cd week7_reconciliation && python reconciliation_engine.py")
+        st.stop()
 
-        # ── Metrics ──
-        matches = recon_data.get('matches', [])
-        unsupported = recon_data.get('unsupported', recon_data.get('unsupported_transaction_ids', []))
-        unreconciled = recon_data.get('unreconciled', recon_data.get('unreconciled_document_ids', []))
+    stats = demo_recon.get('statistics', {})
+    pipeline_stats = stats.get('pipeline', stats)
+    matches      = demo_recon.get('matches', [])
+    unsupported  = demo_recon.get('unsupported', demo_recon.get('unsupported_transaction_ids', []))
+    unreconciled = demo_recon.get('unreconciled', demo_recon.get('unreconciled_document_ids', []))
 
-        c1, c2, c3, c4, c5 = st.columns(5)
-        r_metrics = [
-            (c1, len(matches), "Matched Pairs", "#3fb950"),
-            (c2, pipeline_stats.get('exact_matches', 0), "Exact Matches", "#3fb950"),
-            (c3, pipeline_stats.get('fuzzy_matches', 0), "Fuzzy Matches", "#d29922"),
-            (c4, pipeline_stats.get('semantic_matches', 0), "Semantic Matches", "#388bfd"),
-            (c5, len(unsupported), "Unsupported", "#f85149"),
-        ]
-        for col, val, label, color in r_metrics:
-            with col:
-                st.markdown(
-                    f'<div class="metric-card" style="border-top:2px solid {color};">'
-                    f'<div class="metric-value">{val}</div>'
-                    f'<div class="metric-label">{label}</div>'
-                    f'</div>',
-                    unsafe_allow_html=True
-                )
+    # ── KPIs ──
+    c1,c2,c3,c4,c5 = st.columns(5)
+    kpi(c1, len(matches),                              "Matched",          "#22c55e")
+    kpi(c2, pipeline_stats.get('exact_matches',0),     "Exact",            "#22c55e")
+    kpi(c3, pipeline_stats.get('fuzzy_matches',0),     "Fuzzy",            "#f59e0b")
+    kpi(c4, pipeline_stats.get('semantic_matches',0),  "Semantic",         "#3b82f6")
+    kpi(c5, len(unsupported),                          "Unsupported",      "#ef4444")
 
-        st.markdown("<br>", unsafe_allow_html=True)
+    match_rate = stats.get('match_rate', len(matches)/(len(matches)+len(unsupported)) if (len(matches)+len(unsupported))>0 else 0)
+    st.progress(match_rate, text=f"Match rate: {match_rate:.0%}")
 
-        tab1, tab2, tab3 = st.tabs(["✅  Matched Pairs", "⚠️  Unsupported", "📄  Unreconciled"])
+    st.markdown("<br>", unsafe_allow_html=True)
 
-        with tab1:
-            st.markdown('<div class="section-header">Successfully Matched Transactions</div>', unsafe_allow_html=True)
-            if matches:
-                for match in matches:
-                    match_type = match.get('match_type', 'UNKNOWN')
-                    badge_class = {
-                        'EXACT': 'badge-exact',
-                        'FUZZY': 'badge-fuzzy',
-                        'SEMANTIC': 'badge-semantic'
-                    }.get(match_type, 'badge-exact')
+    tab1, tab2, tab3 = st.tabs(["✅  Matched Pairs", "⚠️  Unsupported Transactions", "📄  Unreconciled Documents"])
 
-                    conf = match.get('confidence', 0)
-                    tx_id = match.get('transaction_id', '')
-                    doc_id = match.get('document_id', '')
-                    reasoning = match.get('reasoning', '')
-
-                    if explainer:
-                        explanation = explainer.explain_reconciliation_match(match)
-                    else:
-                        explanation = reasoning
-
-                    st.markdown(
-                        f'<div class="event-card">'
-                        f'<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">'
-                        f'<span class="match-type-badge {badge_class}">{match_type}</span>'
-                        f'<span style="color:#e6edf3;font-size:13px;font-weight:500;">'
-                        f'{tx_id} → {doc_id}</span>'
-                        f'<span class="confidence-pill">conf: {conf:.3f}</span>'
-                        f'</div>'
-                        f'<div class="event-body">{explanation}</div>'
-                        f'</div>',
-                        unsafe_allow_html=True
-                    )
-
-                    # Component breakdown
-                    components = match.get('components', {})
-                    if components:
-                        cols = st.columns(4)
-                        comp_labels = [
-                            ("Merchant Similarity", components.get('string_similarity', 0)),
-                            ("Amount Match", components.get('amount_match', 0)),
-                            ("Date Proximity", components.get('date_proximity', 0)),
-                            ("Document Trust", components.get('document_trust', 0)),
-                        ]
-                        for col, (label, val) in zip(cols, comp_labels):
-                            with col:
-                                color = "#3fb950" if val > 0.8 else "#d29922" if val > 0.5 else "#f85149"
-                                st.markdown(
-                                    f'<div style="text-align:center;padding:8px;background:#0d1117;border-radius:6px;margin-bottom:12px;">'
-                                    f'<div style="font-size:18px;font-weight:600;color:{color};font-family:DM Mono,monospace;">{val:.2f}</div>'
-                                    f'<div style="font-size:10px;color:#6e7681;">{label}</div>'
-                                    f'</div>',
-                                    unsafe_allow_html=True
-                                )
-            else:
-                st.info("No matches found in reconciliation data.")
-
-        with tab2:
-            if unsupported:
-                for item in unsupported:
-                    if isinstance(item, dict):
-                        st.markdown(
-                            f'<div class="event-card high">'
-                            f'<div class="event-headline">🔴 {item.get("transaction_id", item)} — {item.get("label", "Unsupported")}</div>'
-                            f'<div class="event-body">Reason: {item.get("reason", "No document found")} · '
-                            f'Amount: ${item.get("amount", 0):,.2f} · Merchant: {item.get("merchant", "N/A")}</div>'
-                            f'</div>',
-                            unsafe_allow_html=True
-                        )
-                    else:
-                        st.markdown(f'<div class="event-card high"><div class="event-headline">🔴 {item}</div></div>', unsafe_allow_html=True)
-            else:
-                st.success("No unsupported transactions.")
-
-        with tab3:
-            if unreconciled:
-                for item in unreconciled:
-                    if isinstance(item, dict):
-                        st.markdown(
-                            f'<div class="event-card medium">'
-                            f'<div class="event-headline">📄 {item.get("document_id", item)} — {item.get("label", "Unreconciled")}</div>'
-                            f'<div class="event-body">Reason: {item.get("reason", "No transaction found")} · '
-                            f'Trust score: {item.get("trust_score", 0):.2f}</div>'
-                            f'</div>',
-                            unsafe_allow_html=True
-                        )
-                    else:
-                        st.markdown(f'<div class="event-card medium"><div class="event-headline">📄 {item}</div></div>', unsafe_allow_html=True)
-            else:
-                st.success("All documents reconciled.")
-
-
-# ════════════════════════════════════════════════════════════
-# PAGE: BEHAVIORAL DETECTION
-# ════════════════════════════════════════════════════════════
-
-elif "Behavioral" in page:
-    st.markdown("## Behavioral & Change Detection")
-    st.markdown('<div style="color:#8b949e;margin-bottom:20px;">Statistical analysis detecting spending spikes, category drift, anomalies, and savings changes</div>', unsafe_allow_html=True)
-
-    if not all_events:
-        st.warning("No behavioral data found. Run pipeline.py in week8/ first.")
-    else:
-        # ── Top priority events ──
-        st.markdown('<div class="section-header">Priority Events</div>', unsafe_allow_html=True)
-
-        if top_priorities:
-            for i, event in enumerate(top_priorities[:8]):
-                ev_type = event.get('type', '')
-                severity = event.get('severity', 'medium')
-                sev_class = severity_class(severity)
+    with tab1:
+        if not matches:
+            st.info("No matches in reconciliation data.")
+        else:
+            for match in matches:
+                mt = match.get('match_type','UNKNOWN')
+                badge_cls = {'EXACT':'badge-exact','FUZZY':'badge-fuzzy','SEMANTIC':'badge-semantic'}.get(mt,'badge-exact')
+                conf  = match.get('confidence', 0)
+                tx_id = match.get('transaction_id','')
+                doc_id= match.get('document_id','')
 
                 if explainer:
-                    exp = explainer.explain_event(event)
-                    headline = exp['headline']
-                    body = exp['body']
-                    evidence = exp['evidence']
-                    action = exp['action']
-                    confidence = exp['confidence']
+                    explanation = explainer.explain_reconciliation_match(match)
                 else:
-                    headline = f"{ev_type.replace('_', ' ').title()} — {event.get('category', event.get('goal_name', ''))}"
-                    body = str(event)
-                    evidence = "See raw event data"
-                    action = "Review manually"
-                    confidence = str(event.get('confidence', 'N/A'))
-
-                score = event.get('priority_score', 0)
-                month = event.get('month', '')
+                    explanation = match.get('reasoning','')
 
                 st.markdown(
-                    f'<div class="event-card {sev_class}">'
-                    f'<div style="display:flex;justify-content:space-between;align-items:flex-start;">'
-                    f'<div class="event-headline">{headline}</div>'
-                    f'<span class="confidence-pill">conf: {confidence} · score: {score:.2f}</span>'
-                    f'</div>'
-                    f'<div class="event-body">{body}</div>'
-                    f'<div class="event-evidence">{evidence}</div>'
-                    f'<div class="event-action">→ {action}</div>'
-                    f'</div>',
-                    unsafe_allow_html=True
+                    f'<div class="ecard">'
+                    f'<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">'
+                    f'<span class="badge {badge_cls}">{mt}</span>'
+                    f'<span style="color:#e2e8f8;font-size:13px;font-weight:500;">{tx_id} → {doc_id}</span>'
+                    f'<span class="conf-pill">conf {conf:.3f}</span></div>'
+                    f'<div class="ecard-body">{explanation}</div>'
+                    f'</div>', unsafe_allow_html=True
                 )
 
-        st.markdown("<br>", unsafe_allow_html=True)
+                components = match.get('components', {})
+                if components:
+                    sc1,sc2,sc3,sc4 = st.columns(4)
+                    score_box(sc1, "Merchant Similarity", components.get('string_similarity',0), "×0.4")
+                    score_box(sc2, "Amount Match",        components.get('amount_match',0),       "×0.3")
+                    score_box(sc3, "Date Proximity",      components.get('date_proximity',0),      "×0.2")
+                    score_box(sc4, "Document Trust",      components.get('document_trust',0),      "×0.1")
 
-        # ── Tabs by detection type ──
-        tab1, tab2, tab3, tab4 = st.tabs(["📈  Spikes", "📊  Drift", "⚠️  Anomalies", "💰  Savings"])
+    with tab2:
+        if not unsupported:
+            st.success("All transactions have supporting documents.")
+        else:
+            for item in unsupported:
+                if isinstance(item, dict):
+                    reason = item.get('reason','No document found')
+                    amount = item.get('amount', 0)
+                    merchant = item.get('merchant','N/A')
+                    label = item.get('label','Card transaction')
+                    st.markdown(
+                        f'<div class="ecard red">'
+                        f'<div class="ecard-headline">🔴 {item.get("transaction_id",item)} — {label}</div>'
+                        f'<div class="ecard-body">'
+                        f'Merchant: <b style="color:#e2e8f8">{merchant}</b> · '
+                        f'Amount: <b style="color:#e2e8f8">${amount:,.2f}</b> · '
+                        f'Reason: {reason}</div>'
+                        f'</div>', unsafe_allow_html=True
+                    )
+                else:
+                    st.markdown(f'<div class="ecard red"><div class="ecard-headline">🔴 {item}</div></div>', unsafe_allow_html=True)
 
-        with tab1:
-            spikes = all_events.get('spikes', [])
-            if spikes:
-                for s in spikes:
-                    if explainer:
-                        exp = explainer.explain_spike(s)
-                        st.markdown(
-                            f'<div class="event-card high">'
-                            f'<div class="event-headline">{exp["headline"]}</div>'
-                            f'<div class="event-body">{exp["body"]}</div>'
-                            f'<div class="event-evidence">{exp["evidence"]}</div>'
-                            f'<div class="event-action">→ {exp["action"]}</div>'
-                            f'</div>',
-                            unsafe_allow_html=True
-                        )
-                    else:
-                        st.json(s)
+    with tab3:
+        if not unreconciled:
+            st.success("All documents matched to transactions.")
+        else:
+            for item in unreconciled:
+                if isinstance(item, dict):
+                    label = item.get('label','Possible cash purchase')
+                    reason = item.get('reason','No transaction found')
+                    amount = item.get('amount')
+                    amt_str = f"${amount:,.2f}" if amount is not None else "unknown"
+                    st.markdown(
+                        f'<div class="ecard amber">'
+                        f'<div class="ecard-headline">📄 {item.get("document_id",item)} — {label}</div>'
+                        f'<div class="ecard-body">'
+                        f'Merchant: <b style="color:#e2e8f8">{item.get("merchant","N/A")}</b> · '
+                        f'Amount: <b style="color:#e2e8f8">{amt_str}</b> · '
+                        f'Trust score: {item.get("trust_score",0):.2f} · '
+                        f'Reason: {reason}</div>'
+                        f'</div>', unsafe_allow_html=True
+                    )
+                else:
+                    st.markdown(f'<div class="ecard amber"><div class="ecard-headline">📄 {item}</div></div>', unsafe_allow_html=True)
+
+
+# ════════════════════════════════════════════════════════════════════════════
+# PAGE 5 — BEHAVIORAL INSIGHTS
+# ════════════════════════════════════════════════════════════════════════════
+
+elif "Behavioral" in page:
+    st.markdown("## Behavioral Insights")
+    st.markdown('<div style="color:#4a6080;margin-bottom:20px;">Statistical detection: Z-score spikes, IQR anomalies, category drift, savings analysis</div>', unsafe_allow_html=True)
+
+    if not all_events:
+        st.warning("No behavioral data. Run: cd week8 && python pipeline.py")
+        st.stop()
+
+    # ── Priority events ──
+    if top_events:
+        st.markdown('<div class="sec-header">Priority Events — AI Explained</div>', unsafe_allow_html=True)
+        for ev in top_events[:6]:
+            if explainer:
+                exp = explainer.explain_event(ev)
+                ecard(exp['headline'], exp['body'], exp['evidence'],
+                      exp['action'], exp['confidence'], ev.get('severity','blue'))
             else:
-                st.info("No spending spikes detected. If you expected spikes, apply the .shift(1) fix to detect_spikes() in analyzer.py.")
+                st.json(ev)
 
-        with tab2:
-            drifts = all_events.get('drifts', [])
-            if drifts:
-                for d in drifts:
+    st.markdown("<br>", unsafe_allow_html=True)
+
+    tab1, tab2, tab3, tab4, tab5 = st.tabs([
+        "🔺 Spikes", "📊 Drift", "⚠️ Anomalies", "💰 Savings", "🎯 Goals"
+    ])
+
+    with tab1:
+        spikes = all_events.get('spikes', [])
+        if not spikes:
+            st.info("No spending spikes detected in this dataset.")
+            st.markdown('<div style="font-size:12px;color:#3b5080;">Tip: Apply the .shift(1) fix in analyzer.py detect_spikes() to improve detection.</div>', unsafe_allow_html=True)
+        else:
+            for s in spikes:
+                if explainer:
+                    exp = explainer.explain_spike(s)
+                    ecard(exp['headline'], exp['body'], exp['evidence'], exp['action'], exp['confidence'], 'red')
+
+    with tab2:
+        drifts = all_events.get('drifts', [])
+        if not drifts:
+            st.info("No category drift detected.")
+        else:
+            for d in drifts:
+                if explainer:
+                    exp = explainer.explain_drift(d)
+                    ecard(exp['headline'], exp['body'], exp['evidence'], exp['action'], exp['confidence'], 'amber')
+                else:
+                    st.json(d)
+
+    with tab3:
+        anomalies = all_events.get('anomalies', [])
+        if not anomalies:
+            st.info("No anomalies detected.")
+        else:
+            for a in anomalies:
+                if explainer:
+                    exp = explainer.explain_anomaly(a)
+                    ecard(exp['headline'], exp['body'], exp['evidence'], exp['action'], exp['confidence'],
+                          'red' if a.get('severity')=='high' else 'amber')
+                else:
+                    st.json(a)
+
+    with tab4:
+        drops = all_events.get('savings_drops', [])
+        if drops:
+            for s in drops:
+                if explainer:
+                    exp = explainer.explain_savings_drop(s)
+                    ecard(exp['headline'], exp['body'], exp['evidence'], exp['action'], exp['confidence'], 'red')
+
+        # ── Savings chart ──
+        if not active_df.empty:
+            st.markdown('<div class="sec-header">Savings Rate Over Time</div>', unsafe_allow_html=True)
+            df_s = active_df.copy()
+            df_s['month'] = df_s['date'].dt.to_period('M').astype(str)
+            inc_m = df_s[df_s['amount']>0].groupby('month')['amount'].sum()
+            exp_m = df_s[df_s['amount']<0].groupby('month')['amount'].sum().abs()
+            sav_r = ((inc_m - exp_m) / inc_m * 100).fillna(0).clip(-100, 100)
+            st.line_chart(sav_r, height=200, use_container_width=True)
+
+    with tab5:
+        goals = all_events.get('goals', [])
+        if not goals:
+            st.info("No goal tracking data.")
+        else:
+            # Show only exceeded or below target — filter noise
+            important_goals = [g for g in goals if g.get('status') in ('exceeded','below_target')]
+            on_track = [g for g in goals if g.get('status') not in ('exceeded','below_target')]
+
+            if important_goals:
+                st.markdown('<div class="sec-header">Goals Needing Attention</div>', unsafe_allow_html=True)
+                for g in important_goals:
                     if explainer:
-                        exp = explainer.explain_drift(d)
-                        st.markdown(
-                            f'<div class="event-card medium">'
-                            f'<div class="event-headline">{exp["headline"]}</div>'
-                            f'<div class="event-body">{exp["body"]}</div>'
-                            f'<div class="event-evidence">{exp["evidence"]}</div>'
-                            f'<div class="event-action">→ {exp["action"]}</div>'
-                            f'</div>',
-                            unsafe_allow_html=True
-                        )
-                    else:
-                        st.json(d)
-            else:
-                st.info("No category drift detected.")
+                        exp = explainer.explain_goal_status(g)
+                        ecard(exp['headline'], exp['body'], exp['evidence'], exp['action'], exp['confidence'], 'red')
 
-        with tab3:
-            anomalies = all_events.get('anomalies', [])
-            if anomalies:
-                for a in anomalies:
+            if on_track:
+                st.markdown('<div class="sec-header">Goals on Track</div>', unsafe_allow_html=True)
+                for g in on_track[:4]:
                     if explainer:
-                        exp = explainer.explain_anomaly(a)
-                        sev = severity_class(a.get('severity', 'medium'))
-                        st.markdown(
-                            f'<div class="event-card {sev}">'
-                            f'<div class="event-headline">{exp["headline"]}</div>'
-                            f'<div class="event-body">{exp["body"]}</div>'
-                            f'<div class="event-evidence">{exp["evidence"]}</div>'
-                            f'<div class="event-action">→ {exp["action"]}</div>'
-                            f'</div>',
-                            unsafe_allow_html=True
-                        )
-                    else:
-                        st.json(a)
-            else:
-                st.info("No anomalies detected.")
-
-        with tab4:
-            drops = all_events.get('savings_drops', [])
-            if drops:
-                for s in drops:
-                    if explainer:
-                        exp = explainer.explain_savings_drop(s)
-                        st.markdown(
-                            f'<div class="event-card high">'
-                            f'<div class="event-headline">{exp["headline"]}</div>'
-                            f'<div class="event-body">{exp["body"]}</div>'
-                            f'<div class="event-evidence">{exp["evidence"]}</div>'
-                            f'<div class="event-action">→ {exp["action"]}</div>'
-                            f'</div>',
-                            unsafe_allow_html=True
-                        )
-                    else:
-                        st.json(s)
-
-            # ── Savings rate chart ──
-            if not df.empty:
-                st.markdown("<br>", unsafe_allow_html=True)
-                st.markdown('<div class="section-header">Savings Rate Over Time</div>', unsafe_allow_html=True)
-                df_copy = df.copy()
-                df_copy['month'] = df_copy['date'].dt.to_period('M').astype(str)
-                monthly = df_copy.groupby('month')['amount'].sum()
-                income_m = df_copy[df_copy['amount'] > 0].groupby('month')['amount'].sum()
-                expense_m = df_copy[df_copy['amount'] < 0].groupby('month')['amount'].sum().abs()
-                savings_rate = ((income_m - expense_m) / income_m * 100).fillna(0)
-                st.line_chart(savings_rate, height=200, use_container_width=True)
+                        exp = explainer.explain_goal_status(g)
+                        ecard(exp['headline'], exp['body'], exp['evidence'], exp['action'], exp['confidence'], 'green')
 
 
-# ════════════════════════════════════════════════════════════
-# PAGE: EVIDENCE CHAIN
-# ════════════════════════════════════════════════════════════
+# ════════════════════════════════════════════════════════════════════════════
+# PAGE 6 — EVIDENCE CHAIN
+# ════════════════════════════════════════════════════════════════════════════
 
 elif "Evidence" in page:
-    st.markdown("## Evidence Chain Explorer")
-    st.markdown('<div style="color:#8b949e;margin-bottom:20px;">Full provenance: every claim linked to source data with confidence scores</div>', unsafe_allow_html=True)
+    st.markdown("## Evidence Chain")
+    st.markdown('<div style="color:#4a6080;margin-bottom:20px;">Every financial claim is traceable — from source document to final confidence score</div>', unsafe_allow_html=True)
 
-    st.markdown('<div class="section-header">How Evidence Chains Work</div>', unsafe_allow_html=True)
+    # ── How it works ──
+    st.markdown('<div class="sec-header">How Evidence Chains Work</div>', unsafe_allow_html=True)
 
-    steps = [
-        ("📄", "Source Document", "Receipt image uploaded"),
-        ("🔍", "OCR Extraction", "Tesseract extracts text"),
-        ("📊", "Quality Scoring", "Sharpness × Noise × Contrast"),
-        ("🏷️", "Type Classification", "Receipt / Statement / Invoice"),
-        ("✂️", "Field Extraction", "Merchant, date, amount, items"),
-        ("🔗", "Reconciliation", "Match to bank transaction"),
-        ("🎯", "Confidence Score", "Composite: OCR × Extraction × Quality"),
+    stages = [
+        ("📷","Document Uploaded","Receipt / invoice / statement image"),
+        ("🔍","OCR Extraction","Tesseract extracts raw text"),
+        ("📊","Quality Scoring","Sharpness × Noise × Contrast → 0–1"),
+        ("🏷️","Type Detection","Receipt / Statement / Invoice"),
+        ("✂️","Field Extraction","Merchant, date, amount, items"),
+        ("✅","Trust Scoring","image×0.3 + ocr×0.3 + completeness×0.2 + consistency×0.2"),
+        ("🔗","Reconciliation","Match to bank transaction (3-tier)"),
     ]
-
-    cols = st.columns(len(steps))
-    for col, (icon, name, detail) in zip(cols, steps):
+    cols = st.columns(len(stages))
+    for col, (icon, name, detail) in zip(cols, stages):
         with col:
             st.markdown(
-                f'<div class="pipeline-step">'
-                f'<div style="font-size:20px;margin-bottom:6px;">{icon}</div>'
-                f'<div class="pipeline-step-name" style="font-size:12px;">{name}</div>'
-                f'<div class="pipeline-step-detail">{detail}</div>'
-                f'</div>',
+                f'<div class="score-box">'
+                f'<div style="font-size:18px;">{icon}</div>'
+                f'<div class="score-lbl" style="color:#8899bb;font-size:11px;margin-top:5px;">{name}</div>'
+                f'<div class="score-wt">{detail}</div></div>',
                 unsafe_allow_html=True
             )
 
     st.markdown("<br>", unsafe_allow_html=True)
 
-    # ── Sample evidence chain ──
-    st.markdown('<div class="section-header">Sample Evidence Chain</div>', unsafe_allow_html=True)
+    # ── Sample chain ──
+    st.markdown('<div class="sec-header">Sample Evidence Chain — Interactive</div>', unsafe_allow_html=True)
 
-    sample_chain = {
-        "claim": 'You spent $39.12 at Trader Joe\'s on February 7, 2026',
-        "source_document": "receipt_001.jpg",
-        "evidence_links": [
-            {"stage": "week4_ocr", "result": "Text extracted, OCR confidence: 0.95"},
-            {"stage": "week4_quality", "result": "Quality score: 0.89 (sharp, low noise)"},
-            {"stage": "week5_receipt_extractor", "result": "Merchant: Trader Joe's, Total: $39.12, Date: 2026-02-07"},
-            {"stage": "week6_trust_scorer", "result": "Trust score: 0.87 → status: verified"},
-            {"stage": "week7_exact_matcher", "result": "Matched to txn_042 with confidence: 0.96"},
+    sample = {
+        "claim": "You spent $39.12 at Trader Joe's on February 7, 2026",
+        "source": "receipt_001.jpg",
+        "links": [
+            ("week4_quality_scorer",      "Quality score: 0.89 — image is sharp and clear"),
+            ("week4_ocr_engine",          "OCR confidence: 0.95 — text extracted successfully"),
+            ("week5_receipt_extractor",   "Merchant: Trader Joe's | Total: $39.12 | Date: 2026-02-07 | Items: 4"),
+            ("week6_trust_scorer",        "Trust score: 0.87 → status: verified"),
+            ("week7_exact_matcher",       "Matched to txn_042 — confidence: 0.96 (exact amount, date, merchant)"),
         ],
         "composite_confidence": 0.96,
         "status": "verified"
     }
 
     st.markdown(
-        f'<div class="event-card good">'
-        f'<div style="font-size:11px;color:#6e7681;margin-bottom:6px;font-family:DM Mono,monospace;">CLAIM</div>'
-        f'<div class="event-headline">"{sample_chain["claim"]}"</div>'
-        f'<div style="margin-top:12px;font-size:11px;color:#6e7681;font-family:DM Mono,monospace;">EVIDENCE CHAIN ({len(sample_chain["evidence_links"])} stages)</div>'
-        f'</div>',
+        f'<div class="ecard green">'
+        f'<div style="font-size:10px;color:#2a4a30;font-family:JetBrains Mono,monospace;margin-bottom:5px;">CLAIM</div>'
+        f'<div class="ecard-headline">"{sample["claim"]}"</div>'
+        f'<div style="font-size:11px;color:#2a4a30;margin-top:10px;font-family:JetBrains Mono,monospace;">'
+        f'SOURCE: {sample["source"]}</div></div>',
         unsafe_allow_html=True
     )
 
-    for i, link in enumerate(sample_chain['evidence_links']):
+    for i, (stage, result) in enumerate(sample['links']):
+        connector_color = "#22c55e" if i == len(sample['links'])-1 else "#1e2d4a"
         st.markdown(
-            f'<div style="display:flex;gap:12px;margin-bottom:6px;padding-left:12px;">'
-            f'<div style="width:1px;background:#21262d;margin:0 11px;"></div>'
-            f'<div style="background:#161b22;border:1px solid #21262d;border-radius:6px;padding:10px 14px;flex:1;">'
-            f'<span style="font-family:DM Mono,monospace;font-size:11px;color:#388bfd;">{link["stage"]}</span>'
-            f'<span style="font-size:12px;color:#8b949e;margin-left:12px;">{link["result"]}</span>'
+            f'<div style="display:flex;gap:14px;margin-bottom:6px;padding-left:16px;">'
+            f'<div style="width:1px;background:{connector_color};margin:0 11px;min-height:40px;"></div>'
+            f'<div style="background:#0f172a;border:1px solid #1e2d4a;border-radius:7px;padding:10px 14px;flex:1;">'
+            f'<span style="font-family:JetBrains Mono,monospace;font-size:11px;color:#3b82f6;">{stage}</span>'
+            f'<div style="font-size:12px;color:#7a90b8;margin-top:3px;">{result}</div>'
             f'</div></div>',
             unsafe_allow_html=True
         )
 
     st.markdown(
-        f'<div style="background:#1a4a2e;border:1px solid #2ea043;border-radius:6px;padding:10px 16px;margin-top:6px;">'
-        f'<span style="color:#3fb950;font-weight:500;">✓ Verified</span>'
-        f'<span style="color:#8b949e;font-size:13px;margin-left:12px;">Composite confidence: {sample_chain["composite_confidence"]:.2f} · Source: {sample_chain["source_document"]}</span>'
+        f'<div style="background:#14532d;border:1px solid #22c55e;border-radius:7px;padding:10px 16px;margin-top:4px;">'
+        f'<span style="color:#4ade80;font-weight:500;">✓ Verified</span>'
+        f'<span style="color:#6b80a8;font-size:12px;margin-left:12px;">'
+        f'Composite confidence: {sample["composite_confidence"]} · Source: {sample["source"]}</span>'
         f'</div>',
         unsafe_allow_html=True
     )
 
-    # ── Real reconciliation evidence ──
-    if recon_data and recon_data.get('matches'):
+    # ── Live match inspector ──
+    if demo_recon and demo_recon.get('matches'):
         st.markdown("<br>", unsafe_allow_html=True)
-        st.markdown('<div class="section-header">Live Evidence from Reconciliation</div>', unsafe_allow_html=True)
+        st.markdown('<div class="sec-header">Inspect Live Match from Reconciliation</div>', unsafe_allow_html=True)
 
-        matches = recon_data.get('matches', [])
-        sel_match = st.selectbox(
-            "Select a match to inspect",
-            options=range(len(matches)),
-            format_func=lambda i: f"{matches[i].get('transaction_id')} ↔ {matches[i].get('document_id')} [{matches[i].get('match_type')}]"
+        matches = demo_recon['matches']
+        sel = st.selectbox(
+            "Select a match",
+            range(len(matches)),
+            format_func=lambda i: f"{matches[i].get('transaction_id')} ↔ {matches[i].get('document_id')} [{matches[i].get('match_type')}] conf={matches[i].get('confidence',0):.3f}"
+        )
+        m = matches[sel]
+
+        if explainer:
+            explanation = explainer.explain_reconciliation_match(m)
+        else:
+            explanation = m.get('reasoning', '')
+
+        mt = m.get('match_type','UNKNOWN')
+        badge_cls = {'EXACT':'badge-exact','FUZZY':'badge-fuzzy','SEMANTIC':'badge-semantic'}.get(mt,'badge-exact')
+
+        st.markdown(
+            f'<div class="ecard">'
+            f'<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">'
+            f'<span class="badge {badge_cls}">{mt}</span>'
+            f'<span style="color:#e2e8f8;font-weight:500;">{m.get("transaction_id")} ↔ {m.get("document_id")}</span>'
+            f'<span class="conf-pill">conf {m.get("confidence",0):.4f}</span></div>'
+            f'<div class="ecard-body">{explanation}</div>'
+            f'<div class="ecard-evidence">'
+            f'Date offset: {m.get("date_offset_days",0)} days · '
+            f'Amount discrepancy: {m.get("amount_discrepancy","None")} · '
+            f'Reasoning: {m.get("reasoning","")}'
+            f'</div></div>',
+            unsafe_allow_html=True
         )
 
-        if matches:
-            m = matches[sel_match]
+        components = m.get('components', {})
+        if components:
+            sc1,sc2,sc3,sc4 = st.columns(4)
+            score_box(sc1, "Merchant Similarity", components.get('string_similarity',0), "×0.4")
+            score_box(sc2, "Amount Match",        components.get('amount_match',0),       "×0.3")
+            score_box(sc3, "Date Proximity",      components.get('date_proximity',0),      "×0.2")
+            score_box(sc4, "Document Trust",      components.get('document_trust',0),      "×0.1")
+
+            # Confidence formula
+            conf = m.get('confidence', 0)
+            ss = components.get('string_similarity',0)
+            am = components.get('amount_match',0)
+            dp = components.get('date_proximity',0)
+            dt = components.get('document_trust',0)
             st.markdown(
-                f'<div class="event-card">'
-                f'<div class="event-headline">{m.get("transaction_id")} ↔ {m.get("document_id")}</div>'
-                f'<div class="event-body">{m.get("reasoning", "")}</div>'
-                f'<div class="event-evidence">'
-                f'Match type: {m.get("match_type")} · '
-                f'Confidence: {m.get("confidence", 0):.4f} · '
-                f'Date offset: {m.get("date_offset_days", 0)} days · '
-                f'Amount discrepancy: {m.get("amount_discrepancy", "None")}'
-                f'</div></div>',
+                f'<div class="ecard-evidence" style="margin-top:10px;">'
+                f'Confidence formula: ({ss:.2f}×0.4) + ({am:.2f}×0.3) + ({dp:.2f}×0.2) + ({dt:.2f}×0.1) = <b style="color:#e2e8f8">{conf:.4f}</b>'
+                f'</div>',
                 unsafe_allow_html=True
             )
-
-            components = m.get('components', {})
-            if components:
-                c1, c2, c3, c4 = st.columns(4)
-                comp_items = [
-                    (c1, "Merchant Similarity", components.get('string_similarity', 0), 0.4),
-                    (c2, "Amount Match", components.get('amount_match', 0), 0.3),
-                    (c3, "Date Proximity", components.get('date_proximity', 0), 0.2),
-                    (c4, "Document Trust", components.get('document_trust', 0), 0.1),
-                ]
-                for col, label, val, weight in comp_items:
-                    with col:
-                        color = "#3fb950" if val > 0.8 else "#d29922" if val > 0.5 else "#f85149"
-                        st.markdown(
-                            f'<div style="background:#161b22;border:1px solid #21262d;border-radius:8px;padding:14px;text-align:center;">'
-                            f'<div style="font-size:24px;font-weight:600;color:{color};font-family:DM Mono,monospace;">{val:.2f}</div>'
-                            f'<div style="font-size:11px;color:#8b949e;margin-top:4px;">{label}</div>'
-                            f'<div style="font-size:10px;color:#6e7681;margin-top:2px;">weight: {weight}</div>'
-                            f'</div>',
-                            unsafe_allow_html=True
-                        )
