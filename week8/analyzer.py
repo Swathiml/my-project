@@ -36,7 +36,7 @@ class ChangeDetector:
     # 2. SPENDING SPIKE DETECTION (Z-Score)
     # ============================================
     
-    def detect_spikes(self, z_threshold: float = 2.0, lookback_months: int = 3) -> List[Dict]:
+    def detect_spikes(self, z_threshold: float = 1.8, lookback_months: int = 3) -> List[Dict]:
         """
         Detect spending spikes using Z-score vs rolling average
         Z = (current - mean) / std
@@ -51,8 +51,8 @@ class ChangeDetector:
             spending = monthly[category].abs()  # Convert to positive for comparison
             
             # Calculate rolling statistics
-            rolling_mean = spending.rolling(window=lookback_months, min_periods=1).mean()
-            rolling_std = spending.rolling(window=lookback_months, min_periods=1).std()
+            rolling_mean = spending.shift(1).rolling(window=lookback_months, min_periods=2).mean()
+            rolling_std = spending.shift(1).rolling(window=lookback_months, min_periods=2).std()
             
             # Avoid division by zero
             rolling_std = rolling_std.replace(0, np.nan)
@@ -62,9 +62,24 @@ class ChangeDetector:
             
             # Find spikes
             for month, z_score in z_scores.items():
-                if pd.notna(z_score) and abs(z_score) > z_threshold:
+                if ( 
+                    pd.notna(z_score)
+                    and abs(z_score) > z_threshold
+                ):
                     current_amount = spending[month]
                     previous_mean = rolling_mean[month]
+
+                    if previous_mean is None or pd.isna(previous_mean) or previous_mean == 0:
+                        continue
+
+                    change_pct = ((current_amount - previous_mean) / previous_mean) * 100
+
+                    #ignore small changes 
+                    if abs(change_pct) < 40:
+                        continue
+
+                    if abs(current_amount - previous_mean) < 200:
+                        continue
                     
                     spikes.append({
                         'type': 'spending_spike',
@@ -72,7 +87,7 @@ class ChangeDetector:
                         'month': str(month),
                         'current_amount': round(current_amount, 2),
                         'baseline_amount': round(previous_mean, 2),
-                        'change_pct': round(((current_amount - previous_mean) / previous_mean * 100), 1) if previous_mean > 0 else 0,
+                        'change_pct': round(change_pct, 1),
                         'z_score': round(z_score, 2),
                         'severity': 'high' if abs(z_score) > 3 else 'medium',
                         'confidence': min(0.95, 0.7 + abs(z_score) * 0.05)  # Higher confidence for extreme Z
@@ -162,6 +177,7 @@ class ChangeDetector:
                     'category': category,
                     'transaction_id': txn['transaction_id'],
                     'date': txn['date'].strftime('%Y-%m-%d'),
+                    'month': txn['date'].strftime('%Y-%m'), 
                     'amount': round(abs(txn['amount']), 2),
                     'merchant': txn['merchant_raw'],
                     'upper_bound': round(upper_bound, 2),
@@ -218,6 +234,7 @@ class ChangeDetector:
                 if rate_change_pct < -threshold_pct:  # Drop > 20%
                     drops.append({
                         'type': 'savings_drop',
+                        'category': 'savings',
                         'month': str(month),
                         'savings_rate_previous': round(prev_rate * 100, 1),
                         'savings_rate_current': round(current_rate * 100, 1),
