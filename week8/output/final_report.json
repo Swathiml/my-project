@@ -18,7 +18,7 @@
       ]
     },
     "detection_summary": {
-      "spending_spikes": 0,
+      "spending_spikes": 3,
       "category_drifts": 1,
       "anomalies": 5,
       "savings_drops": 1,
@@ -26,7 +26,21 @@
     },
     "top_events": [
       {
+        "type": "spending_spike",
+        "category": "shopping",
+        "month": "2026-05",
+        "current_amount": 743.99,
+        "baseline_amount": 285.86,
+        "change_pct": 160.3,
+        "z_score": 4.68,
+        "severity": "high",
+        "confidence": 0.9341420397616327,
+        "event_type": "spikes",
+        "priority_score": 1.205
+      },
+      {
         "type": "savings_drop",
+        "category": "savings",
         "month": "2026-05",
         "savings_rate_previous": 69.2,
         "savings_rate_current": 14.8,
@@ -39,40 +53,37 @@
         "priority_score": 1.197
       },
       {
-        "type": "goal_status",
-        "goal_name": "dining_budget",
-        "category": "dining",
-        "month": "2026-05",
-        "budget_limit": 400,
-        "amount_spent": 500.72,
-        "remaining": -100.72,
-        "pct_used": 125.2,
-        "status": "exceeded",
-        "severity": "warning",
-        "confidence": 0.9,
-        "event_type": "goals",
-        "priority_score": 0.713
-      },
-      {
-        "type": "goal_status",
-        "goal_name": "dining_budget",
+        "type": "spending_spike",
         "category": "dining",
         "month": "2026-04",
-        "budget_limit": 400,
-        "amount_spent": 639.04,
-        "remaining": -239.04,
-        "pct_used": 159.8,
-        "status": "exceeded",
-        "severity": "warning",
-        "confidence": 0.9,
-        "event_type": "goals",
-        "priority_score": 0.697
+        "current_amount": 639.04,
+        "baseline_amount": 311.67,
+        "change_pct": 105.0,
+        "z_score": 7.43,
+        "severity": "high",
+        "confidence": 0.95,
+        "event_type": "spikes",
+        "priority_score": 0.972
+      },
+      {
+        "type": "spending_spike",
+        "category": "groceries",
+        "month": "2026-05",
+        "current_amount": 984.73,
+        "baseline_amount": 651.59,
+        "change_pct": 51.1,
+        "z_score": 9.34,
+        "severity": "high",
+        "confidence": 0.95,
+        "event_type": "spikes",
+        "priority_score": 0.773
       },
       {
         "type": "anomaly",
         "category": "shopping",
         "transaction_id": "txn_0214",
         "date": "2026-05-15",
+        "month": "2026-05",
         "amount": 280.0,
         "merchant": "AMAZON.COM*9999 SEATTLE",
         "upper_bound": 99.96,
@@ -80,27 +91,52 @@
         "severity": "high",
         "confidence": 0.85,
         "event_type": "anomalies",
-        "priority_score": 0.696
-      },
-      {
-        "type": "goal_status",
-        "goal_name": "dining_budget",
-        "category": "dining",
-        "month": "2026-06",
-        "budget_limit": 400,
-        "amount_spent": 387.58,
-        "remaining": 12.42,
-        "pct_used": 96.9,
-        "status": "on_track",
-        "severity": "caution",
-        "confidence": 0.9,
-        "event_type": "goals",
-        "priority_score": 0.67
+        "priority_score": 0.762
       }
     ]
   },
   "detailed_results": {
-    "spikes": [],
+    "spikes": [
+      {
+        "type": "spending_spike",
+        "category": "dining",
+        "month": "2026-04",
+        "current_amount": 639.04,
+        "baseline_amount": 311.67,
+        "change_pct": 105.0,
+        "z_score": 7.43,
+        "severity": "high",
+        "confidence": 0.95,
+        "event_type": "spikes",
+        "priority_score": 0.972
+      },
+      {
+        "type": "spending_spike",
+        "category": "groceries",
+        "month": "2026-05",
+        "current_amount": 984.73,
+        "baseline_amount": 651.59,
+        "change_pct": 51.1,
+        "z_score": 9.34,
+        "severity": "high",
+        "confidence": 0.95,
+        "event_type": "spikes",
+        "priority_score": 0.773
+      },
+      {
+        "type": "spending_spike",
+        "category": "shopping",
+        "month": "2026-05",
+        "current_amount": 743.99,
+        "baseline_amount": 285.86,
+        "change_pct": 160.3,
+        "z_score": 4.68,
+        "severity": "high",
+        "confidence": 0.9341420397616327,
+        "event_type": "spikes",
+        "priority_score": 1.205
+      }
+    ],
     "drifts": [
       {
         "type": "category_drift",
@@ -122,6 +158,7 @@
         "category": "dining",
         "transaction_id": "txn_0147",
         "date": "2026-04-04",
+        "month": "2026-04",
         "amount": 90.4,
         "merchant": "UBER EATS HELP.UBER.COM",
         "upper_bound": 62.6,
@@ -129,13 +166,14 @@
         "severity": "medium",
         "confidence": 0.75,
         "event_type": "anomalies",
-        "priority_score": 0.434
+        "priority_score": 0.484
       },
       {
         "type": "anomaly",
         "category": "dining",
         "transaction_id": "txn_0158",
         "date": "2026-04-13",
+        "month": "2026-04",
         "amount": 87.09,
         "merchant": "UBER EATS HELP.UBER.COM",
         "upper_bound": 62.6,
@@ -143,13 +181,14 @@
         "severity": "medium",
         "confidence": 0.75,
         "event_type": "anomalies",
-        "priority_score": 0.431
+        "priority_score": 0.481
       },
       {
         "type": "anomaly",
         "category": "dining",
         "transaction_id": "txn_0177",
         "date": "2026-04-25",
+        "month": "2026-04",
         "amount": 88.63,
         "merchant": "UBER EATS HELP.UBER.COM",
         "upper_bound": 62.6,
@@ -157,13 +196,14 @@
         "severity": "medium",
         "confidence": 0.75,
         "event_type": "anomalies",
-        "priority_score": 0.433
+        "priority_score": 0.483
       },
       {
         "type": "anomaly",
         "category": "dining",
         "transaction_id": "txn_0180",
         "date": "2026-04-26",
+        "month": "2026-04",
         "amount": 90.64,
         "merchant": "UBER EATS HELP.UBER.COM",
         "upper_bound": 62.6,
@@ -171,13 +211,14 @@
         "severity": "medium",
         "confidence": 0.75,
         "event_type": "anomalies",
-        "priority_score": 0.434
+        "priority_score": 0.484
       },
       {
         "type": "anomaly",
         "category": "shopping",
         "transaction_id": "txn_0214",
         "date": "2026-05-15",
+        "month": "2026-05",
         "amount": 280.0,
         "merchant": "AMAZON.COM*9999 SEATTLE",
         "upper_bound": 99.96,
@@ -185,12 +226,13 @@
         "severity": "high",
         "confidence": 0.85,
         "event_type": "anomalies",
-        "priority_score": 0.696
+        "priority_score": 0.762
       }
     ],
     "savings_drops": [
       {
         "type": "savings_drop",
+        "category": "savings",
         "month": "2026-05",
         "savings_rate_previous": 69.2,
         "savings_rate_current": 14.8,
@@ -376,6 +418,45 @@
   },
   "all_events": [
     {
+      "type": "spending_spike",
+      "category": "dining",
+      "month": "2026-04",
+      "current_amount": 639.04,
+      "baseline_amount": 311.67,
+      "change_pct": 105.0,
+      "z_score": 7.43,
+      "severity": "high",
+      "confidence": 0.95,
+      "event_type": "spikes",
+      "priority_score": 0.972
+    },
+    {
+      "type": "spending_spike",
+      "category": "groceries",
+      "month": "2026-05",
+      "current_amount": 984.73,
+      "baseline_amount": 651.59,
+      "change_pct": 51.1,
+      "z_score": 9.34,
+      "severity": "high",
+      "confidence": 0.95,
+      "event_type": "spikes",
+      "priority_score": 0.773
+    },
+    {
+      "type": "spending_spike",
+      "category": "shopping",
+      "month": "2026-05",
+      "current_amount": 743.99,
+      "baseline_amount": 285.86,
+      "change_pct": 160.3,
+      "z_score": 4.68,
+      "severity": "high",
+      "confidence": 0.9341420397616327,
+      "event_type": "spikes",
+      "priority_score": 1.205
+    },
+    {
       "type": "category_drift",
       "category": "healthcare",
       "month": "2026-04",
@@ -393,6 +474,7 @@
       "category": "dining",
       "transaction_id": "txn_0147",
       "date": "2026-04-04",
+      "month": "2026-04",
       "amount": 90.4,
       "merchant": "UBER EATS HELP.UBER.COM",
       "upper_bound": 62.6,
@@ -400,13 +482,14 @@
       "severity": "medium",
       "confidence": 0.75,
       "event_type": "anomalies",
-      "priority_score": 0.434
+      "priority_score": 0.484
     },
     {
       "type": "anomaly",
       "category": "dining",
       "transaction_id": "txn_0158",
       "date": "2026-04-13",
+      "month": "2026-04",
       "amount": 87.09,
       "merchant": "UBER EATS HELP.UBER.COM",
       "upper_bound": 62.6,
@@ -414,13 +497,14 @@
       "severity": "medium",
       "confidence": 0.75,
       "event_type": "anomalies",
-      "priority_score": 0.431
+      "priority_score": 0.481
     },
     {
       "type": "anomaly",
       "category": "dining",
       "transaction_id": "txn_0177",
       "date": "2026-04-25",
+      "month": "2026-04",
       "amount": 88.63,
       "merchant": "UBER EATS HELP.UBER.COM",
       "upper_bound": 62.6,
@@ -428,13 +512,14 @@
       "severity": "medium",
       "confidence": 0.75,
       "event_type": "anomalies",
-      "priority_score": 0.433
+      "priority_score": 0.483
     },
     {
       "type": "anomaly",
       "category": "dining",
       "transaction_id": "txn_0180",
       "date": "2026-04-26",
+      "month": "2026-04",
       "amount": 90.64,
       "merchant": "UBER EATS HELP.UBER.COM",
       "upper_bound": 62.6,
@@ -442,13 +527,14 @@
       "severity": "medium",
       "confidence": 0.75,
       "event_type": "anomalies",
-      "priority_score": 0.434
+      "priority_score": 0.484
     },
     {
       "type": "anomaly",
       "category": "shopping",
       "transaction_id": "txn_0214",
       "date": "2026-05-15",
+      "month": "2026-05",
       "amount": 280.0,
       "merchant": "AMAZON.COM*9999 SEATTLE",
       "upper_bound": 99.96,
@@ -456,10 +542,11 @@
       "severity": "high",
       "confidence": 0.85,
       "event_type": "anomalies",
-      "priority_score": 0.696
+      "priority_score": 0.762
     },
     {
       "type": "savings_drop",
+      "category": "savings",
       "month": "2026-05",
       "savings_rate_previous": 69.2,
       "savings_rate_current": 14.8,

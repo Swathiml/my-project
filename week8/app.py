@@ -260,6 +260,29 @@ def get_explainer():
     except Exception:
         return None
 
+def run_behavioral_pipeline_ui():
+    from pipeline import BehavioralAnalysisPipeline
+    goals_path = OUTPUT_DIR / "ground_truth_events.json"
+    csv_path = OUTPUT_DIR / "synthetic_transactions_6mo.csv"
+    if st.session_state.get("use_uploaded") and st.session_state.get("uploaded_df") is not None:
+        csv_path = OUTPUT_DIR / "_session_active.csv"
+        st.session_state.uploaded_df.to_csv(csv_path, index=False)
+    if not csv_path.exists():
+        return False, "No transaction CSV found. Use demo data or upload a CSV."
+    try:
+        p = BehavioralAnalysisPipeline(
+            str(csv_path),
+            str(goals_path) if goals_path.exists() else None,
+        )
+        p.run_analysis()
+        p.export_results(str(OUTPUT_DIR / "final_report.json"))
+        load_demo_transactions.clear()
+        load_demo_events.clear()
+        return True, None
+    except Exception as e:
+        return False, str(e)
+
+
 def parse_uploaded_csv(uploaded_file) -> pd.DataFrame:
     """Parse any uploaded bank CSV into standard format."""
     df = pd.read_csv(uploaded_file)
@@ -472,33 +495,20 @@ elif "Upload" in page:
         len(invoice_files) if invoice_files else 0,
     ])
 
-    if total_uploaded > 0:
+    demo_csv_ok = (OUTPUT_DIR / "synthetic_transactions_6mo.csv").exists()
+    if total_uploaded > 0 or demo_csv_ok:
         if st.button("🚀 Run Full Pipeline", type="primary", use_container_width=True):
-            with st.spinner("Running ExplainYourMoney pipeline..."):
-                progress = st.progress(0)
-                status = st.empty()
-
-                status.markdown("**Step 1/4** — Loading and normalizing transactions...")
-                progress.progress(25)
-                import time; time.sleep(0.8)
-
-                status.markdown("**Step 2/4** — Processing document images (OCR + extraction)...")
-                progress.progress(50)
-                time.sleep(0.8)
-
-                status.markdown("**Step 3/4** — Running trust scoring and reconciliation...")
-                progress.progress(75)
-                time.sleep(0.8)
-
-                status.markdown("**Step 4/4** — Running behavioral detection...")
-                progress.progress(100)
-                time.sleep(0.5)
-
-                status.empty()
-                progress.empty()
-
-            st.success("✅ Pipeline complete! View results in the other pages.")
-            st.info("Note: Full pipeline integration connects to your Week 4–7 modules. For the demo, results are shown from pre-processed data.")
+            with st.spinner("Running behavioral detection (Week 8) on your transactions..."):
+                ok, err = run_behavioral_pipeline_ui()
+            if ok:
+                st.success("✅ Behavioral analysis finished. Dashboard and Behavioral Insights use fresh results.")
+                st.info(
+                    "Reconciliation page still loads data/week7_reconciliation_report.json. "
+                    "Regenerate that file separately (week 7 script) if you need updated matches."
+                )
+                st.rerun()
+            else:
+                st.error(err or "Pipeline failed.")
     else:
         st.markdown('<div style="text-align:center;color:#2a3a56;padding:20px;">Upload files above to process them</div>', unsafe_allow_html=True)
 
@@ -831,13 +841,12 @@ elif "Evidence" in page:
 
     sample = {
         "claim": "You spent $39.12 at Trader Joe's on February 7, 2026",
-        "source": "receipt_001.jpg",
         "links": [
-            ("week4_quality_scorer",      "Quality score: 0.89 — image is sharp and clear"),
-            ("week4_ocr_engine",          "OCR confidence: 0.95 — text extracted successfully"),
-            ("week5_receipt_extractor",   "Merchant: Trader Joe's | Total: $39.12 | Date: 2026-02-07 | Items: 4"),
-            ("week6_trust_scorer",        "Trust score: 0.87 → status: verified"),
-            ("week7_exact_matcher",       "Matched to txn_042 — confidence: 0.96 (exact amount, date, merchant)"),
+            "Quality score: 0.89 — image is sharp and clear",
+            "OCR confidence: 0.95 — text extracted successfully",
+            "Merchant: Trader Joe's | Total: $39.12 | Date: 2026-02-07 | Items: 4",
+            "Trust score: 0.87 → status: verified",
+            "Matched to bank transaction — confidence: 0.96 (exact amount, date, merchant)",
         ],
         "composite_confidence": 0.96,
         "status": "verified"
@@ -847,19 +856,18 @@ elif "Evidence" in page:
         f'<div class="ecard green">'
         f'<div style="font-size:10px;color:#2a4a30;font-family:JetBrains Mono,monospace;margin-bottom:5px;">CLAIM</div>'
         f'<div class="ecard-headline">"{sample["claim"]}"</div>'
-        f'<div style="font-size:11px;color:#2a4a30;margin-top:10px;font-family:JetBrains Mono,monospace;">'
-        f'SOURCE: {sample["source"]}</div></div>',
+        f'<div style="font-size:11px;color:#2a4a30;margin-top:10px;">'
+        f'Source: uploaded receipt image</div></div>',
         unsafe_allow_html=True
     )
 
-    for i, (stage, result) in enumerate(sample['links']):
+    for i, result in enumerate(sample['links']):
         connector_color = "#22c55e" if i == len(sample['links'])-1 else "#1e2d4a"
         st.markdown(
             f'<div style="display:flex;gap:14px;margin-bottom:6px;padding-left:16px;">'
             f'<div style="width:1px;background:{connector_color};margin:0 11px;min-height:40px;"></div>'
             f'<div style="background:#0f172a;border:1px solid #1e2d4a;border-radius:7px;padding:10px 14px;flex:1;">'
-            f'<span style="font-family:JetBrains Mono,monospace;font-size:11px;color:#3b82f6;">{stage}</span>'
-            f'<div style="font-size:12px;color:#7a90b8;margin-top:3px;">{result}</div>'
+            f'<div style="font-size:12px;color:#7a90b8;">{result}</div>'
             f'</div></div>',
             unsafe_allow_html=True
         )
@@ -868,7 +876,7 @@ elif "Evidence" in page:
         f'<div style="background:#14532d;border:1px solid #22c55e;border-radius:7px;padding:10px 16px;margin-top:4px;">'
         f'<span style="color:#4ade80;font-weight:500;">✓ Verified</span>'
         f'<span style="color:#6b80a8;font-size:12px;margin-left:12px;">'
-        f'Composite confidence: {sample["composite_confidence"]} · Source: {sample["source"]}</span>'
+        f'Composite confidence: {sample["composite_confidence"]}</span>'
         f'</div>',
         unsafe_allow_html=True
     )

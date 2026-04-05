@@ -5,6 +5,7 @@ Add your key to:   ExplainYourMoney/week8/.env
 
 .env file contents:
 OPENAI_API_KEY=sk-...your key here...
+Optional: OPENROUTER_BASE_URL, OPENROUTER_MODEL (OpenRouter keys sk-or-v1-* use OpenRouter automatically)
 """
 
 import os
@@ -15,22 +16,36 @@ from dotenv import load_dotenv
 # Load .env from same directory as this file
 load_dotenv(os.path.join(os.path.dirname(__file__), ".env"))
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
-
+OPENROUTER_BASE_URL = os.getenv("OPENROUTER_BASE_URL", "").strip()
+OPENROUTER_MODEL = os.getenv("OPENROUTER_MODEL", "openai/gpt-4o-mini").strip()
 SYSTEM_PROMPT = """You are a personal finance assistant for the ExplainYourMoney app.
 Explain financial events clearly in 2-3 sentences. Be factual, neutral, and helpful.
 Never use alarmist language. Always end with one short, specific, actionable suggestion.
 Keep total response under 80 words."""
 
 
+def _openai_client_and_model():
+    from openai import OpenAI
+    key = OPENAI_API_KEY
+    if not key:
+        return None, ""
+    base = OPENROUTER_BASE_URL or (
+        "https://openrouter.ai/api/v1" if key.startswith("sk-or-v1") else ""
+    )
+    if base:
+        return OpenAI(api_key=key, base_url=base), OPENROUTER_MODEL
+    return OpenAI(api_key=key), "gpt-4o-mini"
+
+
 def _call_gpt(prompt: str) -> str:
-    """Call GPT-4o-mini. Returns fallback string if API not available."""
     if not OPENAI_API_KEY:
         return "⚠️ Add OPENAI_API_KEY to your week8/.env file to enable AI explanations."
     try:
-        from openai import OpenAI
-        client = OpenAI(api_key=OPENAI_API_KEY)
+        client, model = _openai_client_and_model()
+        if client is None:
+            return "⚠️ Add OPENAI_API_KEY to your week8/.env file to enable AI explanations."
         response = client.chat.completions.create(
-            model="gpt-4o-mini",
+            model=model,
             messages=[
                 {"role": "system", "content": SYSTEM_PROMPT},
                 {"role": "user", "content": prompt}

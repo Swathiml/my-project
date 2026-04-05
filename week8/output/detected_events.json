@@ -464,11 +464,11 @@
   "summary": {
     "total_events": 22,
     "categories_affected": [
-      "healthcare",
-      "shopping",
+      "savings",
       "dining",
+      "shopping",
       "groceries",
-      "savings"
+      "healthcare"
     ]
   }
 }

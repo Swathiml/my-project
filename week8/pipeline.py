@@ -1,5 +1,6 @@
 import pandas as pd
 import json
+from pathlib import Path
 from analyzer import ChangeDetector, EventPrioritizer
 from typing import Optional
 
@@ -70,18 +71,33 @@ class BehavioralAnalysisPipeline:
         if not self.results:
             raise ValueError("Run analysis before exporting results.")
 
-        import os
-        os.makedirs(os.path.dirname(output_path), exist_ok=True)
+        out = Path(output_path)
+        out.parent.mkdir(parents=True, exist_ok=True)
         report = {
             'summary': self.get_summary(),
             'detailed_results': self.results,
             'all_events': self.prioritizer.all_events if self.prioritizer else []
         }
 
-        with open(output_path, 'w') as f:
+        with open(out, 'w') as f:
             json.dump(report, f, indent=2, default=str)
 
-        return output_path
+        top = self.prioritizer.prioritize(top_n=10) if self.prioritizer else []
+        detected_path = out.parent / 'detected_events.json'
+        with open(detected_path, 'w') as f:
+            json.dump({
+                'all_events': self.results,
+                'top_priorities': top,
+                'summary': {
+                    'total_events': sum(len(v) for v in self.results.values() if isinstance(v, list)),
+                    'categories_affected': list(set(
+                        e.get('category') for e in (self.prioritizer.all_events if self.prioritizer else [])
+                        if e.get('category')
+                    ))
+                }
+            }, f, indent=2, default=str)
+
+        return str(out)
 
 
 def main():
